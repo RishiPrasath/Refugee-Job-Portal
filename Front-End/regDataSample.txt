@@ -97,4 +97,11 @@
 
 
 
-
+{
+    "username": "dfhdrfhdhdfh",
+    "password": "fdbd4355645634634",
+    "email": "prasath.rishi@gmail.com",
+    "role": "Case Worker",
+    "profilePicture": "",
+    "full_name": "retshrtjhrtsujrsjrstjr"
+}

@@ -22,6 +22,24 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
+# New Qualification model
+class Qualification(models.Model):
+    school = models.CharField(max_length=255)
+    qualification = models.CharField(max_length=255)
+    start_year = models.IntegerField()
+    end_year = models.IntegerField()
+    candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
+
+# New WorkExperience model
+class WorkExperience(models.Model):
+    company = models.CharField(max_length=255)
+    role = models.CharField(max_length=255)
+    start_year = models.IntegerField()
+    end_year = models.IntegerField()
+    description = models.TextField(null=True, blank=True)
+    skills = models.ManyToManyField('Skill', blank=True)
+    candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
+
 # Candidate profile model to store comprehensive user profiles detailing personal, contact, and professional information.
 class CandidateProfile(models.Model):
     # Foreign key linking to the User model
@@ -43,13 +61,13 @@ class CandidateProfile(models.Model):
     # Summary or bio of the candidate
     summary = models.TextField(null=True, blank=True)
     # Skills of the candidate
-    skills = models.TextField(null=True, blank=True)
-    # Qualifications of the candidate
-    qualifications = models.TextField(null=True, blank=True)
-    # Work experience of the candidate
-    work_experience = models.TextField(null=True, blank=True)
+    skills = models.ManyToManyField('Skill', blank=True)
     # Accessibility requirements of the candidate
     accessibility_requirements = models.TextField(null=True, blank=True)
+    # Immigration status of the candidate
+    immigration_status = models.CharField(max_length=50, null=True, blank=True)
+    # Profile picture of the candidate
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
     # Status of the candidate (e.g., active, inactive)
     status = models.CharField(max_length=50)
 
@@ -71,6 +89,25 @@ class EmployerProfile(models.Model):
     logo_url = models.URLField(null=True, blank=True)
     # Brief description of the company, its mission, and core values
     description = models.TextField(null=True, blank=True)
+
+# New HiringCoordinatorProfile model
+class HiringCoordinatorProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255)
+    contact_phone = models.CharField(max_length=20, null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    emergency_contact_name = models.CharField(max_length=255, null=True, blank=True)
+    emergency_contact_phone = models.CharField(max_length=20, null=True, blank=True)
+    linkedin_profile = models.URLField(null=True, blank=True)
+    github_profile = models.URLField(null=True, blank=True)
+    summary = models.TextField(null=True, blank=True)
+    skills = models.ManyToManyField('Skill', blank=True)
+    accessibility_requirements = models.TextField(null=True, blank=True)
+
+# New CaseWorkerProfile model
+class CaseWorkerProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    full_name = models.CharField(max_length=255)
 
 # Skills model to catalog a variety of skills that can be associated with user profiles and job postings.
 class Skill(models.Model):

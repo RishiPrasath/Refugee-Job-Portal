@@ -22,6 +22,8 @@ import LogoUrlField from '../fields/LogoUrlField';
 import DescriptionField from '../fields/DescriptionField';
 import WorkExperienceField from '../fields/WorkExperienceField';
 import QualificationsField from '../fields/QualificationsField';
+import ImmigrationStatusField from '../fields/ImmigrationStatusField';
+import ProfilePictureField from '../fields/ProfilePictureField'; // Import the new field
 
 const userTypes = ['Candidate', 'Employer', 'Hiring Coordinator', 'Case Worker'];
 
@@ -220,6 +222,7 @@ const Registration: React.FC = () => {
           qualifications: qualifications,
           workExperiences: workExperiences,
           accessibility_requirements: formData.accessibility_requirements,
+          immigration_status: formData.immigration_status, // Add immigration status to form data
         };
       case 'Employer':
         return {
@@ -264,6 +267,16 @@ const Registration: React.FC = () => {
       case 'Candidate':
         return (
           <>
+            <ProfilePictureField
+              value={formData.profilePicture || ''}
+              onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
+              error={errors.profilePicture}
+            />
+            <ImmigrationStatusField
+              value={formData.immigration_status || ''}
+              onChange={(e) => setFormData({ ...formData, immigration_status: e.target.value })}
+              error={errors.immigration_status}
+            />
             <FullNameField
               value={formData.full_name || ''}
               onChange={handleInputChange}
