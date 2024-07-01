@@ -30,8 +30,6 @@ class CandidateProfile(models.Model):
     full_name = models.CharField(max_length=255)
     # Date of birth of the candidate
     date_of_birth = models.DateField(null=True, blank=True)
-    # Contact email of the candidate
-    contact_email = models.EmailField()
     # Contact phone number of the candidate
     contact_phone = models.CharField(max_length=20, null=True, blank=True)
     # Name of the emergency contact
@@ -63,8 +61,6 @@ class EmployerProfile(models.Model):
     company_name = models.CharField(max_length=255)
     # Industry in which the employer operates
     industry = models.CharField(max_length=255, null=True, blank=True)
-    # Primary contact email for the employer
-    contact_email = models.EmailField()
     # Primary contact phone number for the employer
     contact_phone = models.CharField(max_length=20, null=True, blank=True)
     # Physical address or primary location of the employer

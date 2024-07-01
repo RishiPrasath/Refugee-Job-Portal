@@ -1,0 +1,100 @@
+{
+    "username": "ergrweger",
+    "password": "rdeg43436346346",
+    "email": "prasath.rishi@gmail.com",
+    "role": "Employer",
+    "profilePicture": "",
+    "company_name": "ehgershsreh",
+    "industry": "reh5rashreha",
+    "location": "aerhaerhrehreah",
+    "website_url": "https://www.youtube.com/",
+    "logo_url": "C:\\fakepath\\565084.jpg",
+    "description": "segewgewgwegwegrehrehasrherh"
+}
+
+{
+    "username": "ergrweger",
+    "password": "rdeg43436346346",
+    "email": "prasath.rishi@gmail.com",
+    "role": "Candidate",
+    "profilePicture": "",
+    "company_name": "ehgershsreh",
+    "industry": "reh5rashreha",
+    "location": "aerhaerhrehreah",
+    "website_url": "https://www.youtube.com/",
+    "logo_url": "C:\\fakepath\\565084.jpg",
+    "description": "segewgewgwegwegrehrehasrherh",
+    "emergency_contact_name": "Rishi Prasath",
+    "emergency_contact_phone": "92970175",
+    "linkedin_profile": "https://www.linkedin.com/in/rishi-prasath-0aa382247/",
+    "github_profile": "https://github.com/RishiPrasath",
+    "summary": "gerghreshertheher",
+    "skills": [
+        "Fishing",
+        "Dance"
+    ],
+    "accessibility_requirements": "strhntshharehaerharehaerh",
+    "qualifications": [
+        {
+            "id": 1719733283937,
+            "school": "rtshtrhst",
+            "qualification": "rhshtsr",
+            "startYear": "2012",
+            "endYear": "2016"
+        },
+        {
+            "id": 1719733291711,
+            "school": "srthstrh",
+            "qualification": "tshtrhsthtshstrh",
+            "startYear": "",
+            "endYear": ""
+        }
+    ],
+    "workExperiences": [
+        {
+            "id": 1719733296792,
+            "company": "srthsrthstrh",
+            "role": "trshtrshtrshstrh",
+            "startYear": "2022",
+            "endYear": "2023",
+            "skills": [
+                "CSS",
+                "Django"
+            ],
+            "description": "srthrtshrtshrthsrhshsrh"
+        }
+    ]
+}
+
+
+{
+    "username": "ergrweger",
+    "password": "rdeg43436346346",
+    "email": "prasath.rishi@gmail.com",
+    "role": "Hiring Coordinator",
+    "profilePicture": "",
+    "company_name": "ehgershsreh",
+    "industry": "reh5rashreha",
+    "location": "aerhaerhrehreah",
+    "website_url": "https://www.youtube.com/",
+    "logo_url": "C:\\fakepath\\565084.jpg",
+    "description": "segewgewgwegwegrehrehasrherh",
+    "emergency_contact_name": "Rishi Prasath",
+    "emergency_contact_phone": "92970175",
+    "linkedin_profile": "https://www.linkedin.com/in/rishi-prasath-0aa382247/",
+    "github_profile": "https://github.com/RishiPrasath",
+    "summary": "gerghreshertheher",
+    "skills": [
+        "Fishing",
+        "Dance"
+    ],
+    "accessibility_requirements": "strhntshharehaerharehaerh",
+    "full_name": "sewfgewgewgewg"
+}
+
+
+
+
+
+
+
