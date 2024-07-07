@@ -12,7 +12,6 @@ const UsernameField: React.FC<Props> = ({ value, onChange, error }) => {
 
   const validateUsername = (username: string) => {
     if (!username) return 'Username is required';
-    if (!/^[a-zA-Z0-9]+$/.test(username)) return 'Username must be alphanumeric';
     if (username.length < 3) return 'Username must be at least 3 characters';
     return '';
   };

@@ -8,18 +8,25 @@ interface Props {
 }
 
 const LogoUrlField: React.FC<Props> = ({ value, onChange, error }) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      onChange(event); // Pass the event to the parent component
+    }
+  };
+
   return (
     <TextField
       fullWidth
-      type="file"  // Change type to file
+      type="file"
       label="Upload Logo"
-      name="logo_url"
-      onChange={onChange}
+      name="logo"  // Ensure the name attribute is 'logo'
+      onChange={handleFileChange}
       error={!!error}
       helperText={error || 'Upload your company logo'}
       sx={{ mb: 2 }}
       InputLabelProps={{
-        shrink: true,  // This ensures the label doesn't overlap with the file name
+        shrink: true,
       }}
     />
   );

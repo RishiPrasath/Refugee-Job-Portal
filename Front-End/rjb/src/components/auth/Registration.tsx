@@ -23,7 +23,9 @@ import DescriptionField from '../fields/DescriptionField';
 import WorkExperienceField from '../fields/WorkExperienceField';
 import QualificationsField from '../fields/QualificationsField';
 import ImmigrationStatusField from '../fields/ImmigrationStatusField';
-import ProfilePictureField from '../fields/ProfilePictureField'; // Import the new field
+import ProfilePictureField from '../fields/ProfilePictureField'; 
+import { useNavigate } from 'react-router-dom';
+import { useGlobalState } from '../../globalState/globalState';
 
 const userTypes = ['Candidate', 'Employer', 'Hiring Coordinator', 'Case Worker'];
 
@@ -32,7 +34,7 @@ interface FormData {
   password: string;
   email: string;
   role: string;
-  profilePicture?: string;
+  profile_picture?: File;
   skills?: string[];
   workExperiences?: WorkExperience[];
   qualifications?: Qualification[];
@@ -58,15 +60,16 @@ interface Qualification {
 }
 
 const Registration: React.FC = () => {
-  const [userType, setUserType] = useState('');
-  const [formData, setFormData] = useState<FormData>({ username: '', password: '', email: '', role: '', profilePicture: '' });
+  const navigate = useNavigate();
+  const { userType, setUserType } = useGlobalState();
+  const [formData, setFormData] = useState<FormData>({ username: '', password: '', email: '', role: '', profile_picture: undefined });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [workExperiences, setWorkExperiences] = useState<WorkExperience[]>([]);
   const [editIndex, setEditIndex] = useState<number | null>(null);
   const [qualifications, setQualifications] = useState<Qualification[]>([]);
   const [editQualificationIndex, setEditQualificationIndex] = useState<number | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // Added setErrorMessage state
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Handler to update work experiences
   const handleWorkExperienceChange = (index: number, updatedExperience: WorkExperience) => {
@@ -103,8 +106,12 @@ const Registration: React.FC = () => {
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
+    const { name, value, files } = event.target;
+    if (files && files.length > 0) {
+      setFormData({ ...formData, [name]: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const validateEmergencyContactPhone = (phone: string) => {
@@ -201,7 +208,7 @@ const Registration: React.FC = () => {
 
   const filterFormDataByUserType = () => {
     const filteredData = { ...formData };
-
+  
     switch (userType) {
       case 'Candidate':
         return {
@@ -209,7 +216,7 @@ const Registration: React.FC = () => {
           password: formData.password,
           email: formData.email,
           role: formData.role,
-          profilePicture: formData.profilePicture,
+          profile_picture: formData.profile_picture, // Ensure the key is 'profile_picture'
           full_name: formData.full_name,
           contact_phone: formData.contact_phone,
           date_of_birth: formData.date_of_birth,
@@ -219,10 +226,10 @@ const Registration: React.FC = () => {
           github_profile: formData.github_profile,
           summary: formData.summary,
           skills: selectedSkills,
-          qualifications: qualifications,
-          workExperiences: workExperiences,
+          qualifications: JSON.stringify(qualifications), // Convert to JSON string
+          workExperiences: JSON.stringify(workExperiences), // Convert to JSON string
           accessibility_requirements: formData.accessibility_requirements,
-          immigration_status: formData.immigration_status, // Add immigration status to form data
+          immigration_status: formData.immigration_status,
         };
       case 'Employer':
         return {
@@ -230,12 +237,12 @@ const Registration: React.FC = () => {
           password: formData.password,
           email: formData.email,
           role: formData.role,
-          profilePicture: formData.profilePicture,
           company_name: formData.company_name,
           industry: formData.industry,
+          contact_phone: formData.contact_phone,
           location: formData.location,
           website_url: formData.website_url,
-          logo_url: formData.logo_url,
+          logo: formData.logo, // Ensure the key is 'logo'
           description: formData.description,
         };
       case 'Hiring Coordinator':
@@ -245,7 +252,6 @@ const Registration: React.FC = () => {
           password: formData.password,
           email: formData.email,
           role: formData.role,
-          profilePicture: formData.profilePicture,
           full_name: formData.full_name,
         };
       default:
@@ -253,13 +259,70 @@ const Registration: React.FC = () => {
     }
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Create a full form data object including work experiences and qualifications
-    const fullFormData = filterFormDataByUserType();
+    const filteredData = filterFormDataByUserType();
+    const formDataToSend = new FormData();
 
-    console.log(fullFormData);
+    // Explicitly type the filteredData object
+    const typedFilteredData: { [key: string]: any } = filteredData;
+
+    Object.keys(typedFilteredData).forEach(key => {
+      if (typedFilteredData[key] !== undefined) {
+        formDataToSend.append(key, typedFilteredData[key]);
+      }
+    });
+
+    console.log('Form data to send:');
+    formDataToSend.forEach((value, key) => {
+      console.log(`${key}: ${value}`);
+    });
+
+    let url = '';
+    switch (userType) {
+      case 'Candidate':
+        url = 'http://localhost:8000/auth/register/candidate/';
+        break;
+      case 'Employer':
+        url = 'http://localhost:8000/auth/register/employer/';
+        break;
+      case 'Hiring Coordinator':
+        url = 'http://localhost:8000/auth/register/hiring-coordinator/';
+        break;
+      case 'Case Worker':
+        url = 'http://localhost:8000/auth/register/case-worker/';
+        break;
+      default:
+        console.error('Invalid user type');
+        return;
+    }
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      if (!response.ok) {
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || "An unexpected error occurred.");
+      }
+
+      const result = await response.json();
+      console.log(`${userType} registration response:`, result);
+
+      // Clear error message and redirect to login page
+      setErrorMessage(null);
+      navigate('/');
+    } catch (error) {
+      console.error(`Error during ${userType} registration:`, error);
+      if (error instanceof Error) {
+        setErrorMessage(`Registration failed: ${error.message}`);
+      } else {
+        setErrorMessage("An unexpected error occurred during registration.");
+      }
+    }
   };
 
   const renderAdditionalFields = () => {
@@ -268,9 +331,9 @@ const Registration: React.FC = () => {
         return (
           <>
             <ProfilePictureField
-              value={formData.profilePicture || ''}
-              onChange={(e) => setFormData({ ...formData, profilePicture: e.target.value })}
-              error={errors.profilePicture}
+              value={formData.profile_picture || undefined} // Change to undefined
+              onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files?.[0] })} // No need to handle null
+              error={errors.profile_picture}
             />
             <ImmigrationStatusField
               value={formData.immigration_status || ''}
@@ -376,6 +439,11 @@ const Registration: React.FC = () => {
               onChange={handleInputChange}
               error={errors.industry}
             />
+            <ContactPhoneField  // Added ContactPhoneField
+              value={formData.contact_phone || ''}
+              onChange={handleInputChange}
+              error={errors.contact_phone}
+            />
             <LocationField
               value={formData.location || ''}
               onChange={handleInputChange}
@@ -387,9 +455,9 @@ const Registration: React.FC = () => {
               error={errors.website_url}
             />
             <LogoUrlField
-              value={formData.logo_url || ''}
+              value={formData.logo || ''}
               onChange={handleInputChange}
-              error={errors.logo_url}
+              error={errors.logo}
             />
             <DescriptionField
               value={formData.description || ''}
@@ -476,6 +544,11 @@ const Registration: React.FC = () => {
         >
           Register
         </Button>
+        {errorMessage && (
+          <Typography color="error" sx={{ mt: 2 }}>
+            {errorMessage}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

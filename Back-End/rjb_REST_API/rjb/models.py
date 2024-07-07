@@ -40,6 +40,12 @@ class WorkExperience(models.Model):
     skills = models.ManyToManyField('Skill', blank=True)
     candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
 
+def candidate_profile_picture_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/profile_pictures/<user_id>_<candidate_id>/<filename>
+    return f'profile_pictures/{instance.user.id}_{instance.id}/{filename}'
+
+
+
 # Candidate profile model to store comprehensive user profiles detailing personal, contact, and professional information.
 class CandidateProfile(models.Model):
     # Foreign key linking to the User model
@@ -67,9 +73,15 @@ class CandidateProfile(models.Model):
     # Immigration status of the candidate
     immigration_status = models.CharField(max_length=50, null=True, blank=True)
     # Profile picture of the candidate
-    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=candidate_profile_picture_directory_path, null=True, blank=True)
     # Status of the candidate (e.g., active, inactive)
     status = models.CharField(max_length=50)
+
+
+def employer_logo_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/logos/<user_id>_<employer_id>/<filename>
+    return f'logos/{instance.user.id}_{instance.id}/{filename}'
+
 
 # Employer profile model to store comprehensive employer profiles detailing contact, company, and operational information.
 class EmployerProfile(models.Model):
@@ -78,31 +90,24 @@ class EmployerProfile(models.Model):
     # Name of the company or employer
     company_name = models.CharField(max_length=255)
     # Industry in which the employer operates
-    industry = models.CharField(max_length=255, null=True, blank=True)
+    industry = models.CharField(max_length=255)
     # Primary contact phone number for the employer
-    contact_phone = models.CharField(max_length=20, null=True, blank=True)
+    contact_phone = models.CharField(max_length=20, default=' ')
     # Physical address or primary location of the employer
-    location = models.CharField(max_length=255, null=True, blank=True)
+    location = models.CharField(max_length=255)
     # URL of the employer's official website
     website_url = models.URLField(null=True, blank=True)
     # URL for the employer's logo
-    logo_url = models.URLField(null=True, blank=True)
+    logo = models.ImageField(upload_to=employer_logo_directory_path, null=True, blank=True)
     # Brief description of the company, its mission, and core values
     description = models.TextField(null=True, blank=True)
+    # Soft deletion flag
+    is_active = models.BooleanField(default=True)
 
 # New HiringCoordinatorProfile model
 class HiringCoordinatorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=255)
-    contact_phone = models.CharField(max_length=20, null=True, blank=True)
-    date_of_birth = models.DateField(null=True, blank=True)
-    emergency_contact_name = models.CharField(max_length=255, null=True, blank=True)
-    emergency_contact_phone = models.CharField(max_length=20, null=True, blank=True)
-    linkedin_profile = models.URLField(null=True, blank=True)
-    github_profile = models.URLField(null=True, blank=True)
-    summary = models.TextField(null=True, blank=True)
-    skills = models.ManyToManyField('Skill', blank=True)
-    accessibility_requirements = models.TextField(null=True, blank=True)
 
 # New CaseWorkerProfile model
 class CaseWorkerProfile(models.Model):
@@ -129,7 +134,7 @@ class CandidateHasSkill(models.Model):
 # Job postings model to store job listings posted by employers, including requirements and status.
 class JobPosting(models.Model):
     # Foreign key linking to the EmployerProfile model
-    employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE)
+    employer = models.ForeignKey(EmployerProfile, on_delete=models.SET_NULL, null=True, blank=True)
     # Title of the job
     job_title = models.CharField(max_length=255)
     # Description of the job
@@ -210,3 +215,4 @@ class Message(models.Model):
     category = models.CharField(max_length=255, null=True, blank=True)
     # Timestamp of when the message was sent
     sent_at = models.DateTimeField(auto_now_add=True)
+

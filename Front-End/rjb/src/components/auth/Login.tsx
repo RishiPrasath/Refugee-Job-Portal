@@ -2,25 +2,81 @@ import React, { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
 import EmailField from '../fields/EmailField';
 import PasswordField from '../fields/PasswordField';
+import { useGlobalState } from '../../globalState/globalState';
+import { useNavigate } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
   const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
+  const { setLoggedIn, setUsername, setEmail: setGlobalEmail, setUserType, setFullName, setProfilePicture, setSkills, setAccessibilityRequirements, setImmigrationStatus, setCompanyName, loggedIn, userType, username, email: globalEmail, profile_picture, skills, accessibility_requirements, immigration_status, full_name, company_name } = useGlobalState();
+  const navigate = useNavigate();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
+    setEmailError(undefined); // Clear error when user starts typing
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
+    setPasswordError(undefined); // Clear error when user starts typing
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Add your form submission logic here
-    console.log({ email, password });
+    try {
+      const response = await fetch('http://localhost:8000/auth/login/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log('Login successful:', data);
+
+        setLoggedIn(true);
+        setUsername(data.username);
+        setGlobalEmail(data.email);
+        setUserType(data.role);
+        setFullName(data.full_name);
+        setProfilePicture(data.profile_picture);
+        setSkills(data.skills);
+        setAccessibilityRequirements(data.accessibility_requirements);
+        setImmigrationStatus(data.immigration_status);
+        setCompanyName(data.company_name);
+
+        // Log global state variables
+        console.log('Global State after login:', {
+          loggedIn,
+          userType,
+          username,
+          globalEmail,
+          profile_picture,
+          skills,
+          accessibility_requirements,
+          immigration_status,
+          full_name,
+          company_name,
+        });
+
+        navigate('/home');
+      } else {
+        if (data.message === "User does not exist") {
+          setEmailError(data.message);
+        } else if (data.message === "Incorrect password") {
+          setPasswordError(data.message);
+        } else {
+          setEmailError(data.message);
+        }
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      setEmailError('An error occurred during login.');
+    }
   };
 
   return (
@@ -59,6 +115,16 @@ const Login: React.FC = () => {
         >
           Login
         </Button>
+        {emailError && (
+          <Typography color="error" variant="body2">
+            {emailError}
+          </Typography>
+        )}
+        {passwordError && (
+          <Typography color="error" variant="body2">
+            {passwordError}
+          </Typography>
+        )}
       </Box>
     </Box>
   );

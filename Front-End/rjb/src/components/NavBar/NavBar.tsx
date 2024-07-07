@@ -1,34 +1,17 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, Box, Badge, useMediaQuery, Divider } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, Box, useMediaQuery } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
+import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { useTheme } from '@mui/material/styles';
-
-// Define interface for notifications
-interface Notification {
-  notification_id: number;
-  user_id: number;
-  message: string;
-  status: string;
-  notification_type: string;
-  created_at: string;
-}
-
-interface Data {
-  notifications: Notification[];
-}
-
-const data: Data = {
-  notifications: [
-    // Notification data if needed
-  ]
-};
+import { useGlobalState } from '../../globalState/globalState';
 
 const NavBar: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const { loggedIn, setLoggedIn } = useGlobalState();
+  const navigate = useNavigate();
 
   const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
     if (
@@ -40,14 +23,27 @@ const NavBar: React.FC = () => {
     setDrawerOpen(open);
   };
 
+  const handleLogout = () => {
+    setLoggedIn(false);
+    navigate('/');
+  };
+
   const renderNavItems = (
     <List>
-      <ListItem button component={Link} to="/">
-        <ListItemText primary="Login" />
-      </ListItem>
-      <ListItem button component={Link} to="/register">
-        <ListItemText primary="Registration" />
-      </ListItem>
+      {!loggedIn ? (
+        <>
+          <ListItem button component={Link} to="/">
+            <ListItemText primary="Login" />
+          </ListItem>
+          <ListItem button component={Link} to="/register">
+            <ListItemText primary="Registration" />
+          </ListItem>
+        </>
+      ) : (
+        <ListItem button component={Link} to="/home">
+          <ListItemText primary="Home" />
+        </ListItem>
+      )}
     </List>
   );
 
@@ -67,7 +63,7 @@ const NavBar: React.FC = () => {
           <Typography variant="h6" style={{ flexGrow: 1, fontSize: '0.875rem' }}>
             Job Portal
           </Typography>
-          {!isMobile && (
+          {!loggedIn ? (
             <>
               <Button color="inherit" component={Link} to="/" style={{ fontSize: '0.75rem' }}>
                 Login
@@ -76,6 +72,11 @@ const NavBar: React.FC = () => {
                 Registration
               </Button>
             </>
+          ) : (
+            <Button color="inherit" onClick={handleLogout} style={{ fontSize: '0.75rem', marginLeft: 'auto' }}>
+              Log Out
+              <PowerSettingsNewIcon style={{ marginLeft: '0.5rem' }} />
+            </Button>
           )}
         </Toolbar>
       </AppBar>

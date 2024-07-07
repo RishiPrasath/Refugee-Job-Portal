@@ -13,59 +13,56 @@
 }
 
 {
-    "username": "ergrweger",
-    "password": "rdeg43436346346",
+    "username": "sdfgrsdgewrger",
+    "password": "g3465345674537457567657456875467",
     "email": "prasath.rishi@gmail.com",
     "role": "Candidate",
-    "profilePicture": "",
-    "company_name": "ehgershsreh",
-    "industry": "reh5rashreha",
-    "location": "aerhaerhrehreah",
-    "website_url": "https://www.youtube.com/",
-    "logo_url": "C:\\fakepath\\565084.jpg",
-    "description": "segewgewgwegwegrehrehasrherh",
+    "profilePicture": "C:\\fakepath\\1527793.jpg",
+    "full_name": "Rishi Prasath",
+    "contact_phone": "92970175",
+    "date_of_birth": "2024-07-03",
     "emergency_contact_name": "Rishi Prasath",
     "emergency_contact_phone": "92970175",
     "linkedin_profile": "https://www.linkedin.com/in/rishi-prasath-0aa382247/",
     "github_profile": "https://github.com/RishiPrasath",
-    "summary": "gerghreshertheher",
+    "summary": "wegerherherher",
     "skills": [
-        "Fishing",
-        "Dance"
+        "Pharmaceutical Technician",
+        "Chemical Science"
     ],
-    "accessibility_requirements": "strhntshharehaerharehaerh",
     "qualifications": [
         {
-            "id": 1719733283937,
-            "school": "rtshtrhst",
-            "qualification": "rhshtsr",
-            "startYear": "2012",
-            "endYear": "2016"
+            "id": 1719854444400,
+            "school": "regergre",
+            "qualification": "gerggrege",
+            "startYear": "2008",
+            "endYear": "2009"
         },
         {
-            "id": 1719733291711,
-            "school": "srthstrh",
-            "qualification": "tshtrhsthtshstrh",
-            "startYear": "",
-            "endYear": ""
+            "id": 1719854450682,
+            "school": "regarehgerth",
+            "qualification": "htrshrthjtrhtrhsthstrhstrhrtshrth",
+            "startYear": "2008",
+            "endYear": "2007"
         }
     ],
     "workExperiences": [
         {
-            "id": 1719733296792,
-            "company": "srthsrthstrh",
-            "role": "trshtrshtrshstrh",
-            "startYear": "2022",
-            "endYear": "2023",
+            "id": 1719854462088,
+            "company": "strhtsrhtsrh",
+            "role": "tshshsrh",
+            "startYear": "2008",
+            "endYear": "2019",
             "skills": [
-                "CSS",
-                "Django"
+                "Fishing",
+                "Pharmaceutical Technician"
             ],
-            "description": "srthrtshrtshrthsrhshsrh"
+            "description": "rsthrthrtshstrhstrhrtshstrhsrthhtrshtrshrshtsrhhsth"
         }
-    ]
+    ],
+    "accessibility_requirements": "srthfgshbdfsbsfbdsfgsdagergregregaergaergregre",
+    "immigration_status": "Asylum Seeker"
 }
-
 
 {
     "username": "ergrweger",

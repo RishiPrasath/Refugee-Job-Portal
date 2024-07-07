@@ -1,0 +1,147 @@
+### Candidate (Asylum Seeker)
+
+{
+  "username": "john_doe",
+  "password": "SecurePass123!",
+  "email": "john.doe@example.com",
+  "role": "Candidate",
+  "profile_picture": "path/to/profile_picture.jpg",
+  "full_name": "John Doe",
+  "contact_phone": "+447911123456",
+  "date_of_birth": "1990-01-01",
+  "emergency_contact_name": "Jane Doe",
+  "emergency_contact_phone": "+447911654321",
+  "linkedin_profile": "https://www.linkedin.com/in/johndoe",
+  "github_profile": "https://github.com/johndoe",
+  "summary": "Experienced software developer with a passion for creating innovative solutions.",
+  "skills": ["Python", "Django", "React"],
+  "qualifications": [
+    {
+      "id": 1,
+      "school": "University of London",
+      "qualification": "BSc Computer Science",
+      "start_year": "2008",
+      "end_year": "2012"
+    }
+  ],
+  "workExperiences": [
+    {
+      "id": 1,
+      "company": "Tech Solutions Ltd",
+      "role": "Software Developer",
+      "startYear": "2013",
+      "endYear": "2018",
+      "skills": ["Python", "Django"],
+      "description": "Developed and maintained web applications."
+    }
+  ],
+  "accessibility_requirements": "Wheelchair accessible office",
+  "immigration_status": "Asylum Seeker"
+}
+
+### Candidate (Refugee)
+
+{
+  "username": "mary_smith",
+  "password": "SecurePass123!",
+  "email": "mary.smith@example.com",
+  "role": "Candidate",
+  "profile_picture": "path/to/profile_picture.jpg",
+  "full_name": "Mary Smith",
+  "contact_phone": "+447911987654",
+  "date_of_birth": "1985-05-15",
+  "emergency_contact_name": "John Smith",
+  "emergency_contact_phone": "+447911123987",
+  "linkedin_profile": "https://www.linkedin.com/in/marysmith",
+  "github_profile": "https://github.com/marysmith",
+  "summary": "Skilled data analyst with extensive experience in data visualization and analysis.",
+  "skills": ["SQL", "Tableau", "Python"],
+  "qualifications": [
+    {
+      "id": 1,
+      "school": "University of Manchester",
+      "qualification": "MSc Data Science",
+      "start_year": "2010",
+      "end_year": "2012"
+    }
+  ],
+  "workExperiences": [
+    {
+      "id": 1,
+      "company": "Data Insights Ltd",
+      "role": "Data Analyst",
+      "startYear": "2013",
+      "endYear": "2019",
+      "skills": ["SQL", "Tableau"],
+      "description": "Analyzed and visualized data to support business decisions."
+    }
+  ],
+  "accessibility_requirements": "None",
+  "immigration_status": "Refugee"
+}
+
+### Employer
+
+{
+  "username": "tech_corp",
+  "password": "SecurePass123!",
+  "email": "hr@techcorp.com",
+  "role": "Employer",
+  "company_name": "Tech Corp",
+  "industry": "Information Technology",
+  "contact_phone": "+447911223344",
+  "location": "London, UK",
+  "website_url": "https://www.techcorp.com",
+  "logo": "path/to/logo.jpg",
+  "description": "Leading technology company specializing in software development."
+}
+
+{
+  "username": "data_solutions",
+  "password": "SecurePass123!",
+  "email": "hr@datasolutions.com",
+  "role": "Employer",
+  "company_name": "Data Solutions",
+  "industry": "Data Analytics",
+  "contact_phone": "+447911556677",
+  "location": "Manchester, UK",
+  "website_url": "https://www.datasolutions.com",
+  "logo": "path/to/logo.jpg",
+  "description": "Innovative company providing data analysis and visualization services."
+}
+
+### Hiring Coordinator
+
+{
+  "username": "alice_jones",
+  "password": "SecurePass123!",
+  "email": "alice.jones@example.com",
+  "role": "Hiring Coordinator",
+  "full_name": "Alice Jones"
+}
+
+{
+  "username": "bob_brown",
+  "password": "SecurePass123!",
+  "email": "bob.brown@example.com",
+  "role": "Hiring Coordinator",
+  "full_name": "Bob Brown"
+}
+
+### Case Worker
+
+{
+  "username": "charlie_green",
+  "password": "SecurePass123!",
+  "email": "charlie.green@example.com",
+  "role": "Case Worker",
+  "full_name": "Charlie Green"
+}
+
+{
+  "username": "diana_white",
+  "password": "SecurePass123!",
+  "email": "diana.white@example.com",
+  "role": "Case Worker",
+  "full_name": "Diana White"
+}
