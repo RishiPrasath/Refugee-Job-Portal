@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, TextField, Button, Typography, Autocomplete, MenuItem, Select, FormControl, InputLabel } from '@mui/material';
-import { availableSkills } from '../../globals';
+import { availableSkills } from '../../../globals'; // Adjust the path as needed
 
 interface WorkExperience {
   id: number;
@@ -94,6 +94,7 @@ const WorkExperienceField: React.FC<Props> = ({
             </Select>
           </FormControl>
           <Autocomplete
+            freeSolo
             multiple
             options={availableSkills}
             getOptionLabel={(option) => option}

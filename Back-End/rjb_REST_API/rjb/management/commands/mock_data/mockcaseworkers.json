@@ -1,0 +1,31 @@
+[
+    {
+      "username": "john_black",
+      "password": "SecurePass123!",
+      "email": "john.black@example.com",
+      "role": "Case Worker",
+      "full_name": "John Black"
+    },
+    {
+      "username": "susan_green",
+      "password": "SecurePass123!",
+      "email": "susan.green@example.com",
+      "role": "Case Worker",
+      "full_name": "Susan Green"
+    },
+    {
+      "username": "michael_brown",
+      "password": "SecurePass123!",
+      "email": "michael.brown@example.com",
+      "role": "Case Worker",
+      "full_name": "Michael Brown"
+    },
+    {
+      "username": "linda_white",
+      "password": "SecurePass123!",
+      "email": "linda.white@example.com",
+      "role": "Case Worker",
+      "full_name": "Linda White"
+    }
+  ]
+  

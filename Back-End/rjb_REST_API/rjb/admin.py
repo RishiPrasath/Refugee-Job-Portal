@@ -13,7 +13,8 @@ from .models import (
     Message, 
     Skill, 
     HiringCoordinatorProfile, 
-    CaseWorkerProfile
+    CaseWorkerProfile,
+    CandidateSavesJobPosting  # Added this line
 )
 
 class HiringCoordinatorProfileAdmin(admin.ModelAdmin):
@@ -99,6 +100,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     search_fields = ('job__job_title', 'applicant__username')
     list_filter = ('status',)
 
+class CandidateSavesJobPostingAdmin(admin.ModelAdmin):  # Added this class
+    list_display = ('candidate', 'job_posting', 'saved_at')
+    search_fields = ('candidate__user__username', 'job_posting__job_title')
+    list_filter = ('saved_at',)
+
 # Register your models here with the custom admin classes
 admin.site.register(User, UserAdmin)
 admin.site.register(Qualification)
@@ -111,3 +117,4 @@ admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Interview)
 admin.site.register(Notification)
 admin.site.register(Message)
+admin.site.register(CandidateSavesJobPosting, CandidateSavesJobPostingAdmin)  # Added this line

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .models import JobPosting, Application
 
 # Create your views here.
 
@@ -12,3 +13,4 @@ def test_json(request):
         "status": "success"
     }
     return Response(data)
+

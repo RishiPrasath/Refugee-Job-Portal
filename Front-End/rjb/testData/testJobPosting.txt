@@ -1,0 +1,69 @@
+Job Title: Junior Software Developer
+
+Job Description: We are looking for a Junior Software Developer to join our inclusive team at Tech Corp. The ideal candidate will have some experience in software development, a passion for learning, and a desire to work in a supportive environment. Responsibilities include assisting in designing, developing, and maintaining software applications, collaborating with cross-functional teams, and learning from senior developers.
+
+Requirements:
+1. Some experience in software development or relevant coursework
+2. Basic knowledge of Python, JavaScript, and React
+3. Willingness to learn and adapt
+4. Strong problem-solving skills
+5. Good communication and teamwork abilities
+
+Location: London, UK
+
+Compensation Amount: 2083
+
+Compensation Type: Monthly
+
+Job Type: Full-time
+
+Employment Term: Permanent
+
+Immigration Salary List (ISL): No
+
+Skills: Python, JavaScript, React, Node.js, SQL
+
+
+
+
+
+
+
+Job Title: IT Support Technician
+
+Job Description: Tech Corp is seeking an IT Support Technician to provide technical assistance to our staff and help maintain our IT infrastructure. This role is ideal for someone with a foundational understanding of IT systems and a keen interest in technology solutions. Responsibilities include troubleshooting hardware and software issues, assisting with network administration, and supporting the deployment of new applications.
+
+Requirements:
+1. Proven experience in IT support or a related field
+2. Familiarity with Microsoft Windows environments, basic networking, and common office software
+3. Ability to communicate effectively in English, both verbally and in writing
+4. Strong analytical and problem-solving skills
+5. Excellent interpersonal skills and a team-oriented attitude
+
+Location: London, UK
+
+Compensation Amount: 2200
+
+Compensation Type: Monthly
+
+Job Type: Full-time
+
+Employment Term: Permanent
+
+Immigration Salary List (ISL): Yes
+
+Skills: Windows, Networking, Hardware Troubleshooting, Software Installation, Help Desk Support
+
+
+
+
+
+
+
+
+
+
+
+
+
+

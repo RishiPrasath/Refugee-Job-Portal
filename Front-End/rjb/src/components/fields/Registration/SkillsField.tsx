@@ -12,6 +12,7 @@ interface Props {
 const SkillsField: React.FC<Props> = ({ value, onChange, error, availableSkills, label = "Skills" }) => {
   return (
     <Autocomplete
+      freeSolo
       multiple
       options={availableSkills}
       getOptionLabel={(option) => option}

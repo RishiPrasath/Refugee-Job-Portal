@@ -1,0 +1,64 @@
+Flaticon provides a comprehensive set of terms of use that you should be aware of when using their icons. Here is a summary and some guidance on the key points:
+
+### Key Points from Flaticon's Terms of Use:
+
+1. **License Types**:
+   - **Free License**: You can use the icons for free under certain conditions, which typically include providing attribution to Flaticon.
+   - **Premium License**: By subscribing to a premium plan, you can use the icons without attribution and gain access to additional resources.
+
+2. **Usage Rights**:
+   - **Personal and Commercial Use**: Icons can be used for both personal and commercial projects.
+   - **Modification**: You can modify the icons to fit your needs.
+   - **Redistribution**: You cannot redistribute or sell the icons as your own.
+
+3. **Attribution**:
+   - **Required for Free License**: When using free icons, you must provide proper attribution to Flaticon. This usually involves including a credit line such as "Icon made by [author] from www.flaticon.com".
+   - **Not Required for Premium License**: If you have a premium subscription, attribution is not required.
+
+4. **Prohibited Uses**:
+   - **Trademark Use**: Icons cannot be used as part of a trademark, logo, or brand without proper licensing.
+   - **Offensive Content**: Icons cannot be used in a way that is offensive, defamatory, or illegal.
+
+5. **Distribution Platforms**:
+   - **Websites, Apps, and Social Media**: Icons can be used on websites, apps, and social media platforms, but the terms regarding attribution and licensing must be followed.
+   - **Print and Physical Products**: Icons can be used in printed materials and physical products under the same terms.
+
+### Example Uses with Attribution (Free License):
+
+- **Website**: When using a Flaticon icon on your website, include a credit line somewhere on the page (usually in the footer) such as:
+  ```html
+  <p>Icon made by <a href="https://www.flaticon.com/authors/author-name" title="author name">author name</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></p>
+  ```
+
+- **Mobile App**: Include an attribution in the app's "About" section or credits page:
+  ```plaintext
+  Icon made by [author name] from www.flaticon.com
+  ```
+
+### Example Uses without Attribution (Premium License):
+
+- **Website**: Simply use the icon without needing to include any credit lines.
+- **Mobile App**: Use the icons freely in the app without adding any attribution in the credits.
+
+### Steps to Use Flaticon Icons Correctly:
+
+1. **Choose Icons**:
+   - Search and select the icons you want to use from Flaticon.
+   - Ensure you check the license type of each icon (free or premium).
+
+2. **Download Icons**:
+   - Download the icons, ensuring you keep track of the authors for attribution if using the free license.
+
+3. **Include Icons in Your Project**:
+   - Add the icons to your website, app, or other projects.
+   - If using a free license, include proper attribution as specified by Flaticon.
+
+4. **Follow Usage Restrictions**:
+   - Do not use icons in logos or trademarks without appropriate licensing.
+   - Avoid using icons in any offensive or illegal content.
+
+### Checking the Terms:
+
+- For the most accurate and up-to-date information, always refer to the [Flaticon Terms of Use](https://www.flaticon.com/terms-of-use) and the specific license details provided on the icon's download page.
+
+By adhering to these guidelines, you can effectively and legally use Flaticon icons in your projects.

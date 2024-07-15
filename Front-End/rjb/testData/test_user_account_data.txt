@@ -1,5 +1,4 @@
 ### Candidate (Asylum Seeker)
-
 {
   "username": "john_doe",
   "password": "SecurePass123!",
@@ -38,9 +37,7 @@
   "accessibility_requirements": "Wheelchair accessible office",
   "immigration_status": "Asylum Seeker"
 }
-
 ### Candidate (Refugee)
-
 {
   "username": "mary_smith",
   "password": "SecurePass123!",

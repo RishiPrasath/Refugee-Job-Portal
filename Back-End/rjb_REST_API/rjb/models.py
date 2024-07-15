@@ -76,7 +76,8 @@ class CandidateProfile(models.Model):
     profile_picture = models.ImageField(upload_to=candidate_profile_picture_directory_path, null=True, blank=True)
     # Status of the candidate (e.g., active, inactive)
     status = models.CharField(max_length=50)
-
+    # Foreign key linking to the CaseWorkerProfile model
+    case_worker = models.ForeignKey('CaseWorkerProfile', on_delete=models.SET_NULL, null=True, blank=True)
 
 def employer_logo_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/logos/<user_id>_<employer_id>/<filename>
@@ -145,7 +146,7 @@ class JobPosting(models.Model):
     location = models.CharField(max_length=255, null=True, blank=True)
     # Compensation amount for the job
     compensation_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    # Type of compensation (e.g., hourly, monthly, annual)
+    # Type of compensation (e.g., hourly, monthly)
     compensation_type = models.CharField(max_length=50, null=True, blank=True)
     # Type of job (e.g., full-time, part-time, contract, internship)
     job_type = models.CharField(max_length=50, null=True, blank=True)
@@ -153,8 +154,10 @@ class JobPosting(models.Model):
     employment_term = models.CharField(max_length=50, null=True, blank=True)
     # Status of the job posting (e.g., open, closed, archived)
     status = models.CharField(max_length=50)
-    # Indicates whether immigration assistance is provided
-    immigration_assistance = models.BooleanField(null=True, blank=True)
+    # Indicates whether the job is under the Immigration Salary List in the UK
+    ISL = models.BooleanField(null=True, blank=True)
+    # Skills required for the job
+    skills = models.ManyToManyField('Skill', through='JobRequiresSkill', blank=True)
 
 # Intermediate model to map job postings to their required skills, enabling skill-specific job searches.
 class JobRequiresSkill(models.Model):
@@ -216,3 +219,11 @@ class Message(models.Model):
     # Timestamp of when the message was sent
     sent_at = models.DateTimeField(auto_now_add=True)
 
+# New CandidateSavesJobPosting model
+class CandidateSavesJobPosting(models.Model):
+    candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
+    job_posting = models.ForeignKey('JobPosting', on_delete=models.CASCADE)
+    saved_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('candidate', 'job_posting')

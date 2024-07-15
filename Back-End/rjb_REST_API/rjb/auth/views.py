@@ -1,3 +1,4 @@
+import random
 import traceback
 from rjb.models import User, CandidateProfile, EmployerProfile, HiringCoordinatorProfile, CaseWorkerProfile
 from rest_framework.decorators import api_view
@@ -9,6 +10,8 @@ import os
 from django.core.files.storage import FileSystemStorage
 from django.conf import settings
 from django.contrib.auth import authenticate
+from rjb.models import *
+import base64
 
 @csrf_exempt
 def login(request):
@@ -32,10 +35,24 @@ def login(request):
         print("User role: ", role)
         full_name = " "
         company_name = " "
+        immigration_status = " "
+        accessibility_requirements = " "
+        assigned_case_worker = " "
+        skills = []
+        profile_picture = " "
         # Fetch full name based on user role
         if role == 'Candidate':
             print("User is a candidate")
-            full_name = CandidateProfile.objects.get(user=user).full_name
+            candidate_profile = CandidateProfile.objects.get(user=user)
+            full_name = candidate_profile.full_name
+            immigration_status = candidate_profile.immigration_status
+            accessibility_requirements = candidate_profile.accessibility_requirements
+            assigned_case_worker = candidate_profile.case_worker.full_name
+            skills = [skill.skill_name for skill in candidate_profile.skills.all()]
+            print("Skills: ", skills)
+            if candidate_profile.profile_picture:
+                with open(candidate_profile.profile_picture.path, "rb") as image_file:
+                    profile_picture = base64.b64encode(image_file.read()).decode('utf-8')
         elif role == 'Employer':
             print("User is an employer")
             company_name = EmployerProfile.objects.get(user=user).company_name
@@ -53,10 +70,15 @@ def login(request):
             "email": user.email,
             "role": role,
             "full_name": full_name,
-            "company_name": company_name
+            "company_name": company_name,
+            "immigration_status": immigration_status,
+            "accessibility_requirements": accessibility_requirements,
+            "assigned_case_worker": assigned_case_worker,
+            "skills": skills,
+            "profile_picture": profile_picture
         }
 
-        print("response_data: ", response_data)
+        #print("response_data: ", response_data)
 
         return JsonResponse(response_data)
     except Exception as e:
@@ -79,8 +101,6 @@ def register_candidate(request):
             data = request.POST.dict()
             profile_picture = request.FILES.get('profile_picture')
 
-            print("profile_picture: ", profile_picture)
-
             # Define mandatory and optional fields
             mandatory_fields = [
                 'username', 'password', 'email', 'role', 'full_name', 
@@ -93,30 +113,6 @@ def register_candidate(request):
                 'skills', 'qualifications', 'workExperiences'
             ]
             
-            # Check and print mandatory fields
-            print("Mandatory Fields:")
-            for field in mandatory_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: MISSING")
-            
-            # Check and print optional fields
-            print("\nOptional Fields:")
-            for field in optional_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: Not provided")
-            
-            if profile_picture:
-                print("profile picture detected")
-                print(f"profile_picture: {profile_picture}")
-            else:
-                print("no profile picture detected")
-
-            
-
             # Check if user already exists
             if User.objects.filter(username=data['username']).exists():
                 return JsonResponse({'error': 'A user with this username already exists'}, status=400)
@@ -131,6 +127,18 @@ def register_candidate(request):
                 role=data['role']
             )
             
+            # Assign a caseworker to the candidate
+            case_workers = CaseWorkerProfile.objects.all()
+            if not case_workers.exists():
+                return JsonResponse({'error': 'No case workers available'}, status=400)
+            
+            # Find caseworkers with no candidates assigned
+            unassigned_case_workers = case_workers.filter(candidateprofile__isnull=True)
+            if unassigned_case_workers.exists():
+                case_worker = random.choice(unassigned_case_workers)
+            else:
+                case_worker = random.choice(case_workers)
+            
             # Create CandidateProfile
             candidate_profile = CandidateProfile.objects.create(
                 user=user,
@@ -143,7 +151,8 @@ def register_candidate(request):
                 github_profile=data.get('github_profile'),
                 summary=data.get('summary'),
                 accessibility_requirements=data.get('accessibility_requirements'),
-                immigration_status=data.get('immigration_status')
+                immigration_status=data.get('immigration_status'),
+                case_worker=case_worker
             )
             
             # Handle profile picture
@@ -170,8 +179,8 @@ def register_candidate(request):
                     Qualification.objects.create(
                         school=qualification['school'],
                         qualification=qualification['qualification'],
-                        start_year=qualification['startYear'],  # Fix KeyError
-                        end_year=qualification['endYear'],  # Fix KeyError
+                        start_year=qualification['startYear'],
+                        end_year=qualification['endYear'],
                         candidate=candidate_profile
                     )
             
@@ -182,8 +191,8 @@ def register_candidate(request):
                     work_exp = WorkExperience.objects.create(
                         company=work_experience['company'],
                         role=work_experience['role'],
-                        start_year=work_experience['startYear'],  # Fix KeyError
-                        end_year=work_experience['endYear'],  # Fix KeyError
+                        start_year=work_experience['startYear'],
+                        end_year=work_experience['endYear'],
                         description=work_experience.get('description'),
                         candidate=candidate_profile
                     )
@@ -192,13 +201,14 @@ def register_candidate(request):
                         for skill_name in work_exp_skills:
                             skill, created = Skill.objects.get_or_create(skill_name=skill_name.strip())
                             work_exp.skills.add(skill)
-            
+
+            print("Assigned case worker: ", case_worker.full_name)
+
             return JsonResponse({'message': 'Candidate registration successful', 'data': data})
         except Exception as e:
             print("Exception occurred:", str(e))
             print(traceback.format_exc())  # Print the full traceback for debugging
             return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
-
 
 @csrf_exempt
 def register_employer(request):

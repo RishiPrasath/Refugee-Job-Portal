@@ -1,0 +1,393 @@
+[
+    {
+      "username": "amira_khan",
+      "password": "SecurePass123!",
+      "email": "amira.khan@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Amira Khan",
+      "gender": "Female",
+      "contact_phone": "+447911111111",
+      "date_of_birth": "1995-04-15",
+      "emergency_contact_name": "Amina Khan",
+      "emergency_contact_phone": "+447911222222",
+      "linkedin_profile": "https://www.linkedin.com/in/amirakhan",
+      "github_profile": "https://github.com/amirakhan",
+      "summary": "Experienced social worker with a background in community support and advocacy.",
+      "skills": ["Community Outreach", "Counseling", "Social Work"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Birmingham",
+          "qualification": "BA Social Work",
+          "start_year": "2012",
+          "end_year": "2016"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Refugee Support Network",
+          "role": "Social Worker",
+          "startYear": "2017",
+          "endYear": "2021",
+          "skills": ["Community Outreach", "Counseling"],
+          "description": "Provided support and counseling services to refugees and asylum seekers."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Refugee"
+    },
+    {
+      "username": "ali_hussein",
+      "password": "SecurePass123!",
+      "email": "ali.hussein@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Ali Hussein",
+      "gender": "Male",
+      "contact_phone": "+447911333333",
+      "date_of_birth": "1988-11-23",
+      "emergency_contact_name": "Fatima Hussein",
+      "emergency_contact_phone": "+447911444444",
+      "linkedin_profile": "https://www.linkedin.com/in/alihussein",
+      "github_profile": "https://github.com/alihussein",
+      "summary": "Skilled mechanical engineer with experience in maintenance and repair of industrial machinery.",
+      "skills": ["Mechanical Engineering", "Maintenance", "Repair"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Manchester",
+          "qualification": "BEng Mechanical Engineering",
+          "start_year": "2006",
+          "end_year": "2010"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Industrial Solutions Ltd",
+          "role": "Mechanical Engineer",
+          "startYear": "2011",
+          "endYear": "2016",
+          "skills": ["Mechanical Engineering", "Maintenance"],
+          "description": "Handled maintenance and repair of industrial machinery."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Asylum Seeker"
+    },
+    {
+      "username": "sara_ahmed",
+      "password": "SecurePass123!",
+      "email": "sara.ahmed@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Sara Ahmed",
+      "gender": "Female",
+      "contact_phone": "+447911555555",
+      "date_of_birth": "1991-05-29",
+      "emergency_contact_name": "Ahmed Ali",
+      "emergency_contact_phone": "+447911666666",
+      "linkedin_profile": "https://www.linkedin.com/in/saraahmed",
+      "github_profile": "https://github.com/saraahmed",
+      "summary": "Experienced nurse with a background in patient care and emergency response.",
+      "skills": ["Nursing", "Patient Care", "Emergency Response"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Edinburgh",
+          "qualification": "BSc Nursing",
+          "start_year": "2009",
+          "end_year": "2013"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "NHS Scotland",
+          "role": "Nurse",
+          "startYear": "2014",
+          "endYear": "2020",
+          "skills": ["Nursing", "Patient Care"],
+          "description": "Provided comprehensive nursing care to patients in various settings."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Refugee"
+    },
+    {
+      "username": "mohammed_rahman",
+      "password": "SecurePass123!",
+      "email": "mohammed.rahman@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Mohammed Rahman",
+      "gender": "Male",
+      "contact_phone": "+447911777777",
+      "date_of_birth": "1984-09-11",
+      "emergency_contact_name": "Ayesha Rahman",
+      "emergency_contact_phone": "+447911888888",
+      "linkedin_profile": "https://www.linkedin.com/in/mohammedrahman",
+      "github_profile": "https://github.com/mohammedrahman",
+      "summary": "IT professional with extensive experience in network administration and cybersecurity.",
+      "skills": ["Network Administration", "Cybersecurity", "IT Support"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Sheffield",
+          "qualification": "MSc Cybersecurity",
+          "start_year": "2005",
+          "end_year": "2007"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "TechSecure Ltd",
+          "role": "Network Administrator",
+          "startYear": "2008",
+          "endYear": "2018",
+          "skills": ["Network Administration", "Cybersecurity"],
+          "description": "Managed and secured the network infrastructure for various clients."
+        }
+      ],
+      "accessibility_requirements": "Wheelchair accessible office",
+      "immigration_status": "Asylum Seeker"
+    },
+    {
+      "username": "leila_hassan",
+      "password": "SecurePass123!",
+      "email": "leila.hassan@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Leila Hassan",
+      "gender": "Female",
+      "contact_phone": "+447911999999",
+      "date_of_birth": "1993-07-21",
+      "emergency_contact_name": "Hassan Ahmed",
+      "emergency_contact_phone": "+447911000000",
+      "linkedin_profile": "https://www.linkedin.com/in/leilahassan",
+      "github_profile": "https://github.com/leilahassan",
+      "summary": "Data scientist with a passion for using data to drive decision-making.",
+      "skills": ["Data Science", "Python", "Machine Learning"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Manchester",
+          "qualification": "MSc Data Science",
+          "start_year": "2012",
+          "end_year": "2014"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "DataTech Ltd",
+          "role": "Data Scientist",
+          "startYear": "2015",
+          "endYear": "2020",
+          "skills": ["Data Science", "Python"],
+          "description": "Developed and implemented machine learning models for various applications."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Refugee"
+    },
+    {
+      "username": "yousef_ali",
+      "password": "SecurePass123!",
+      "email": "yousef.ali@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Yousef Ali",
+      "gender": "Male",
+      "contact_phone": "+447911111222",
+      "date_of_birth": "1995-03-18",
+      "emergency_contact_name": "Aisha Ali",
+      "emergency_contact_phone": "+447911333444",
+      "linkedin_profile": "https://www.linkedin.com/in/yousefali",
+      "github_profile": "https://github.com/yousefali",
+      "summary": "Software developer with a focus on backend systems and API development.",
+      "skills": ["Java", "Spring Boot", "SQL"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "Imperial College London",
+          "qualification": "BEng Software Engineering",
+          "start_year": "2013",
+          "end_year": "2017"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Backend Solutions Ltd",
+          "role": "Backend Developer",
+          "startYear": "2018",
+          "endYear": "2021",
+          "skills": ["Java", "Spring Boot"],
+          "description": "Developed and maintained backend services and APIs."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Asylum Seeker"
+    },
+    {
+      "username": "farah_abdi",
+      "password": "SecurePass123!",
+      "email": "farah.abdi@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Farah Abdi",
+      "gender": "Female",
+      "contact_phone": "+447911555666",
+      "date_of_birth": "1986-12-01",
+      "emergency_contact_name": "Omar Abdi",
+      "emergency_contact_phone": "+447911777888",
+      "linkedin_profile": "https://www.linkedin.com/in/farahabdi",
+      "github_profile": "https://github.com/farahabdi",
+      "summary": "Experienced teacher with a background in primary education and curriculum development.",
+      "skills": ["Teaching", "Curriculum Development", "Classroom Management"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Warwick",
+          "qualification": "BA Primary Education",
+          "start_year": "2004",
+          "end_year": "2008"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "City School",
+          "role": "Primary School Teacher",
+          "startYear": "2009",
+          "endYear": "2019",
+          "skills": ["Teaching", "Classroom Management"],
+          "description": "Taught various subjects to primary school students and developed curriculum."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Refugee"
+    },
+    {
+      "username": "rahim_bakshi",
+      "password": "SecurePass123!",
+      "email": "rahim.bakshi@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Rahim Bakshi",
+      "gender": "Male",
+      "contact_phone": "+447911999000",
+      "date_of_birth": "1990-10-10",
+      "emergency_contact_name": "Sadia Bakshi",
+      "emergency_contact_phone": "+447911888999",
+      "linkedin_profile": "https://www.linkedin.com/in/rahimbakshi",
+      "github_profile": "https://github.com/rahimbakshi",
+      "summary": "Professional chef with expertise in culinary arts and kitchen management.",
+      "skills": ["Culinary Arts", "Kitchen Management", "Menu Planning"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "Le Cordon Bleu London",
+          "qualification": "Diploma in Culinary Arts",
+          "start_year": "2008",
+          "end_year": "2010"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Gourmet Restaurant",
+          "role": "Head Chef",
+          "startYear": "2011",
+          "endYear": "2019",
+          "skills": ["Culinary Arts", "Kitchen Management"],
+          "description": "Led the kitchen team and designed the menu."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Asylum Seeker"
+    },
+    {
+      "username": "zahra_ali",
+      "password": "SecurePass123!",
+      "email": "zahra.ali@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Zahra Ali",
+      "gender": "Female",
+      "contact_phone": "+447911444555",
+      "date_of_birth": "1983-06-22",
+      "emergency_contact_name": "Mohammed Ali",
+      "emergency_contact_phone": "+447911666777",
+      "linkedin_profile": "https://www.linkedin.com/in/zahraali",
+      "github_profile": "https://github.com/zahraali",
+      "summary": "Marketing manager with a talent for digital marketing strategies and content creation.",
+      "skills": ["SEO", "Content Marketing", "Google Analytics"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Leeds",
+          "qualification": "BA Marketing",
+          "start_year": "2001",
+          "end_year": "2005"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Digital Marketing Ltd",
+          "role": "Marketing Manager",
+          "startYear": "2006",
+          "endYear": "2021",
+          "skills": ["SEO", "Google Analytics"],
+          "description": "Developed and implemented digital marketing strategies."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Refugee"
+    },
+    {
+      "username": "hassan_abdullah",
+      "password": "SecurePass123!",
+      "email": "hassan.abdullah@example.com",
+      "role": "Candidate",
+      "profile_picture": "path/to/profile_picture.jpg",
+      "full_name": "Hassan Abdullah",
+      "gender": "Male",
+      "contact_phone": "+447911777888",
+      "date_of_birth": "1997-01-30",
+      "emergency_contact_name": "Nadia Abdullah",
+      "emergency_contact_phone": "+447911888999",
+      "linkedin_profile": "https://www.linkedin.com/in/hassanabdullah",
+      "github_profile": "https://github.com/hassanabdullah",
+      "summary": "Junior software developer with a passion for coding and learning new technologies.",
+      "skills": ["Java", "Python", "HTML"],
+      "qualifications": [
+        {
+          "id": 1,
+          "school": "University of Bradford",
+          "qualification": "BSc Computer Science",
+          "start_year": "2015",
+          "end_year": "2019"
+        }
+      ],
+      "workExperiences": [
+        {
+          "id": 1,
+          "company": "Innovative Tech Ltd",
+          "role": "Junior Developer",
+          "startYear": "2020",
+          "endYear": "2022",
+          "skills": ["Java", "Python"],
+          "description": "Assisted in developing and maintaining software applications."
+        }
+      ],
+      "accessibility_requirements": "None",
+      "immigration_status": "Asylum Seeker"
+    }
+  ]
+  

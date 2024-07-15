@@ -22,7 +22,9 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('rjb.auth.urls')),
-    # Add other URL patterns here
+    path('employers/', include('rjb.employers.urls')),  # Include the employers URLs
+    path('advisors/', include('rjb.advisors.urls')),  # Include the advisors URLs
+    path('candidates/', include('rjb.candidates.urls')),  # Include the candidates URLs
 ]
 
 if settings.DEBUG:

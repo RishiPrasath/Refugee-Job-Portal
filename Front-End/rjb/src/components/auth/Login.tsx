@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import EmailField from '../fields/EmailField';
-import PasswordField from '../fields/PasswordField';
+import EmailField from '../../components/fields/Registration/EmailField';
+import PasswordField from '../../components/fields/Registration/PasswordField';
 import { useGlobalState } from '../../globalState/globalState';
 import { useNavigate } from 'react-router-dom';
 
@@ -10,7 +10,29 @@ const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState<string | undefined>(undefined);
   const [passwordError, setPasswordError] = useState<string | undefined>(undefined);
-  const { setLoggedIn, setUsername, setEmail: setGlobalEmail, setUserType, setFullName, setProfilePicture, setSkills, setAccessibilityRequirements, setImmigrationStatus, setCompanyName, loggedIn, userType, username, email: globalEmail, profile_picture, skills, accessibility_requirements, immigration_status, full_name, company_name } = useGlobalState();
+  const { 
+    setLoggedIn, 
+    setUsername, 
+    setEmail: setGlobalEmail, 
+    setUserType, 
+    setFullName, 
+    setProfilePicture, 
+    setSkills, 
+    setAccessibilityRequirements, 
+    setImmigrationStatus, 
+    setCompanyName, 
+    setAssignedCaseWorker,
+    loggedIn, 
+    userType, 
+    username, 
+    email: globalEmail, 
+    profile_picture, 
+    skills, 
+    accessibility_requirements, 
+    immigration_status, 
+    full_name, 
+    company_name 
+  } = useGlobalState();
   const navigate = useNavigate();
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +70,7 @@ const Login: React.FC = () => {
         setAccessibilityRequirements(data.accessibility_requirements);
         setImmigrationStatus(data.immigration_status);
         setCompanyName(data.company_name);
+        setAssignedCaseWorker(data.assigned_case_worker);
 
         // Log global state variables
         console.log('Global State after login:', {
