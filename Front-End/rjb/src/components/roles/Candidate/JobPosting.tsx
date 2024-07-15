@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Grid, Chip, Button } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WorkIcon from '@mui/icons-material/Work';
 import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound';
@@ -19,6 +19,7 @@ interface JobDetails {
   status: string;
   ISL: boolean;
   skills: string[];
+  company_name: string;
 }
 
 const JobPosting: React.FC = () => {
@@ -33,14 +34,24 @@ const JobPosting: React.FC = () => {
     employment_term: '',
     status: '',
     ISL: false,
-    skills: []
+    skills: [],
+    company_name: ''
   };
   const [jobDetails, setJobDetails] = useState<JobDetails>(defaultJobDetails);
   const { company, jobId } = useParams<{ company: string; jobId: string }>();
   const { email, username } = useGlobalState();
   const [isSaved, setIsSaved] = useState(false);
+  const [hasApplied, setHasApplied] = useState(false); // New state for application status
+  const navigate = useNavigate();
 
   useEffect(() => {
+    console.log("==============================================================");
+    console.log("Company: ", company);
+    console.log("Job ID: ", jobId);
+    console.log("Email: ", email);
+    console.log("Username: ", username);
+    console.log("==============================================================");
+
     const fetchJobDetails = async () => {
       try {
         const url = `http://localhost:8000/candidates/viewJobDetails/${company}/${jobId}`;
@@ -72,9 +83,51 @@ const JobPosting: React.FC = () => {
       }
     };
 
+    const checkIfApplied = async () => { // New function to check if the candidate has applied
+      try {
+        const response = await fetch(`http://localhost:8000/candidates/getAppliedJobs?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
+        const appliedJobs = await response.json();
+        console.log("Applied Jobs:", appliedJobs);
+        if (response.ok) {
+          const hasApplied = appliedJobs.some((job: { id: number }) => job.id === parseInt(jobId || '0'));
+          setHasApplied(hasApplied);
+        } else {
+          console.error('Failed to fetch applied jobs:', appliedJobs.error);
+        }
+      } catch (error) {
+        console.error('Failed to fetch applied jobs:', error);
+      }
+    };
+
     fetchJobDetails();
     checkIfJobIsSaved();
+    checkIfApplied(); // Check if the candidate has applied
   }, [company, jobId, email, username]);
+
+  const handleApplyForJob = () => {
+    navigate(`/applyForJob/${company}/${jobDetails.job_title}/${jobId}`);
+  };
+
+  const handleWithdrawApplication = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/candidates/withdrawApplication', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, username, job_id: jobId, company_name: company, job_title: jobDetails.job_title }),
+      });
+  
+      if (response.ok) {
+        setHasApplied(false);
+        console.log('Application withdrawn successfully');
+      } else {
+        console.error('Failed to withdraw application');
+      }
+    } catch (error) {
+      console.error('Failed to withdraw application:', error);
+    }
+  };
 
   const handleSaveJob = async () => {
     try {
@@ -83,19 +136,13 @@ const JobPosting: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: email,
-          username: username,
-          job_title: jobDetails.job_title,
-          company_name: company,
-        }),
+        body: JSON.stringify({ email, username, job_title: jobDetails.job_title, company_name: company }),
       });
 
-      const data = await response.json();
       if (response.ok) {
         setIsSaved(true);
       } else {
-        console.error('Failed to save job:', data.error);
+        console.error('Failed to save job');
       }
     } catch (error) {
       console.error('Failed to save job:', error);
@@ -109,47 +156,23 @@ const JobPosting: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: email,
-          username: username,
-          job_title: jobDetails.job_title,
-          company_name: company,
-        }),
+        body: JSON.stringify({ email, username, job_title: jobDetails.job_title, company_name: company }),
       });
 
-      const data = await response.json();
       if (response.ok) {
         setIsSaved(false);
       } else {
-        console.error('Failed to remove job:', data.error);
+        console.error('Failed to remove saved job');
       }
     } catch (error) {
-      console.error('Failed to remove job:', error);
+      console.error('Failed to remove saved job:', error);
     }
   };
 
-  const requirementsList = jobDetails.requirements
-    ? jobDetails.requirements.split('|').filter(req => req.trim() !== '')
-    : [];
-
-  const JobDescription: React.FC = () => (
-    <Grid item xs={12}>
-      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold' }}>
-        {jobDetails.job_title}
-      </Typography>
-      <Box display="flex" alignItems="flex-start">
-        <InfoIcon sx={{ verticalAlign: 'middle', mr: 1, mt: 0.5 }} />
-        <Typography variant="body1" paragraph>
-          {jobDetails.job_description}
-        </Typography>
-      </Box>
-    </Grid>
-  );
-
   const JobActions: React.FC = () => (
     <Grid item xs={12} display="flex" justifyContent="center" mt={2}>
-      <Button variant="contained" color="primary" sx={{ mr: 2, px: 4, py: 1.5 }}>
-        Apply for Job
+      <Button variant="contained" color="primary" sx={{ mr: 2, px: 4, py: 1.5 }} onClick={hasApplied ? handleWithdrawApplication : handleApplyForJob}>
+        {hasApplied ? 'Withdraw Application' : 'Apply for Job'}
       </Button>
       <Button
         variant={isSaved ? 'contained' : 'outlined'}
@@ -170,13 +193,12 @@ const JobPosting: React.FC = () => {
       <Card>
         <CardContent>
           <Grid container spacing={2}>
-            <JobDescription />
             <Grid item xs={12}>
               <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
                 Requirements:
               </Typography>
               <ul>
-                {requirementsList.map((requirement, index) => (
+                {jobDetails.requirements.split(',').map((requirement, index) => (
                   <li key={index}>
                     <Typography variant="body1">{requirement.trim()}</Typography>
                   </li>

@@ -178,9 +178,11 @@ class Application(models.Model):
     # Cover letter for the application
     cover_letter = models.TextField(null=True, blank=True)
     # CV for the application
-    cv = models.BigIntegerField(null=True, blank=True)
-    # Status of the application (e.g., submitted, reviewed, accepted, rejected)
+    cv = models.FileField(upload_to='cvs/', null=True, blank=True)
+    # Status of the application (e.g., submitted, reviewed, upcoming interview, interview scheduled, interview completed, accepted, rejected)
     status = models.CharField(max_length=50)
+    # Timestamp of when the application was created
+    created_at = models.DateTimeField(auto_now_add=True)
 
 # Interviews model to manage scheduling and outcomes of interviews linked to job applications.
 class Interview(models.Model):

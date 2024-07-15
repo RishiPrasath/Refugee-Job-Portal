@@ -29,6 +29,7 @@ interface CandidateProfile {
   qualifications: Qualification[];
   workExperiences: WorkExperience[];
   profile_picture: string | null;
+  caseworker: Caseworker | null;
 }
 
 interface Skill {
@@ -56,18 +57,28 @@ interface WorkExperience {
   candidate_id: number;
 }
 
+interface Caseworker {
+  full_name: string;
+  email: string;
+}
+
 interface Job {
   id: number;
-  title: string;
-  company: string;
-  location: string;
-  immigrationSalaryList: boolean;
+  job_title: string;  // For applied jobs
+  company_name: string;  // For applied jobs
+  title?: string;  // For saved jobs
+  company?: string;  // For saved jobs
+  location?: string;  // Optional, as it might not be present in the response
+  immigrationSalaryList?: boolean;  // Optional, as it might not be present in the response
+  status?: string;  // Optional, as it might not be present in the response
+  date_time_applied?: string;  // Optional, as it might not be present in the response
 }
 
 const CandidateProfile: React.FC = () => {
   const { username, email } = useGlobalState();
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
   const [savedJobs, setSavedJobs] = useState<Job[]>([]);
+  const [appliedJobs, setAppliedJobs] = useState<Job[]>([]); // New state for applied jobs
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -104,12 +115,32 @@ const CandidateProfile: React.FC = () => {
       }
     };
 
+    const fetchAppliedJobs = async () => { // New function to fetch applied jobs
+      try {
+        const response = await fetch(`http://localhost:8000/candidates/getAppliedJobs?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+        if (response.ok) {
+          console.log("Applied Jobs:", data);
+          setAppliedJobs(data);
+        } else {
+          console.error('Error fetching applied jobs:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching applied jobs:', error);
+      }
+    };
+
     fetchProfile();
     fetchSavedJobs();
+    fetchAppliedJobs(); // Fetch applied jobs
   }, [email, username]);
 
-  const handleCardClick = (jobId: number, company: string) => {
-    navigate(`/jobposting/${company}/${jobId}`);
+  const handleCardClick = (jobId: number, company: string | undefined) => {
+    if (company) {
+      navigate(`/candidate-job-view/${company}/${jobId}`);
+    } else {
+      console.error('Company name is undefined');
+    }
   };
 
   if (!profile) {
@@ -127,7 +158,7 @@ const CandidateProfile: React.FC = () => {
                   <Avatar
                     src={`data:image/jpeg;base64,${profile.profile_picture}`}
                     alt={profile.full_name}
-                    sx={{ width: 150, height: 150 }}
+                    sx={{ width: 128, height: 128 }}
                   />
                 )}
               </Grid>
@@ -148,6 +179,19 @@ const CandidateProfile: React.FC = () => {
           </CardContent>
         </Card>
       </Box>
+      {profile.caseworker && (
+        <Box mt={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <ContactEmergencyIcon style={{ marginRight: '8px' }} /> Caseworker Details
+              </Typography>
+              <Typography variant="body1"><strong>Full Name:</strong> {profile.caseworker.full_name}</Typography>
+              <Typography variant="body1"><strong>Email:</strong> {profile.caseworker.email}</Typography>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
       <Box mt={3}>
         <Card>
           <CardContent>
@@ -213,6 +257,48 @@ const CandidateProfile: React.FC = () => {
           </CardContent>
         </Card>
       </Box>
+      {appliedJobs.length > 0 && ( // New section for applied jobs
+        <Box mt={3}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                <WorkIcon style={{ marginRight: '8px' }} /> Applied Job Postings
+              </Typography>
+              <Grid container spacing={2}>
+                {appliedJobs.map((job, index) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} onClick={() => handleCardClick(job.id, job.company_name)}>
+                      <CardContent sx={{ flexGrow: 1 }}>
+                        <Typography variant="h6" component="div" style={{ marginBottom: '8px' }}>
+                          {job.job_title}
+                        </Typography>
+                        <Typography color="text.secondary" style={{ marginBottom: '8px' }}>
+                          {job.company_name}
+                        </Typography>
+                        <Typography color="text.secondary" style={{ marginBottom: '8px' }}>
+                          <strong>Status</strong>
+                        </Typography>
+                        <Typography color="text.secondary" style={{ marginBottom: '8px' }}>
+                          {job.status}
+                        </Typography>
+                        <Typography color="text.secondary" style={{ marginBottom: '8px' }}>
+                          <strong>Applied on</strong>
+                        </Typography>
+                        <Typography color="text.secondary" style={{ marginBottom: '8px' }}>
+                          {job.date_time_applied ? new Date(job.date_time_applied).toLocaleDateString() : 'N/A'} at {job.date_time_applied ? new Date(job.date_time_applied).toLocaleTimeString() : 'N/A'}
+                        </Typography>
+                      </CardContent>
+                      <CardActions sx={{ marginTop: 'auto' }}>
+                        <Button size="small">Learn More</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </CardContent>
+          </Card>
+        </Box>
+      )}
       {savedJobs.length > 0 && (
         <Box mt={3}>
           <Card>
@@ -223,7 +309,7 @@ const CandidateProfile: React.FC = () => {
               <Grid container spacing={2}>
                 {savedJobs.map((job, index) => (
                   <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
-                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} onClick={() => handleCardClick(job.id, job.company)}>
+                    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }} onClick={() => handleCardClick(job.id ?? 0, job.company)}>
                       <CardContent sx={{ flexGrow: 1 }}>
                         <Typography variant="h6" component="div">
                           {job.title}

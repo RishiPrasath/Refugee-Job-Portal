@@ -1,10 +1,12 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
-from rjb.models import JobPosting, EmployerProfile , CandidateProfile, User, CandidateSavesJobPosting
+from rjb.models import JobPosting, EmployerProfile , CandidateProfile, User, CandidateSavesJobPosting, Application
 import base64
+import os
+from django.conf import settings
 
 @api_view(['GET'])
 def home(request):
@@ -53,6 +55,7 @@ def viewJobDetails(request, company, job_id):
         employer = EmployerProfile.objects.get(company_name=company)
         job = JobPosting.objects.get(id=job_id, employer=employer)
         job_details = {
+            'job_id': job.id,
             'company_name': employer.company_name,
             'job_title': job.job_title,
             'job_description': job.job_description,
@@ -74,7 +77,6 @@ def viewJobDetails(request, company, job_id):
     
 
 
-@api_view(['GET'])
 def getCandidateProfile(request):
     email = request.GET.get('email')
     username = request.GET.get('username')
@@ -88,6 +90,14 @@ def getCandidateProfile(request):
         if candidate_profile.profile_picture:
             with open(candidate_profile.profile_picture.path, "rb") as image_file:
                 profile_picture_base64 = base64.b64encode(image_file.read()).decode('utf-8')
+        
+        # Get caseworker details
+        caseworker_data = None
+        if candidate_profile.case_worker:
+            caseworker_data = {
+                'full_name': candidate_profile.case_worker.full_name,
+                'email': candidate_profile.case_worker.user.email,
+            }
         
         profile_data = {
             'full_name': candidate_profile.full_name,
@@ -105,6 +115,7 @@ def getCandidateProfile(request):
             'qualifications': [{'id': qualification.id, 'school': qualification.school, 'qualification': qualification.qualification, 'start_year': qualification.start_year, 'end_year': qualification.end_year} for qualification in candidate_profile.qualification_set.all()],
             'workExperiences': [{'id': experience.id, 'company': experience.company, 'role': experience.role, 'start_year': experience.start_year, 'end_year': experience.end_year, 'description': experience.description} for experience in candidate_profile.workexperience_set.all()],
             'profile_picture': profile_picture_base64,
+            'caseworker': caseworker_data,  # Add caseworker details
         }
         
         return JsonResponse(profile_data)
@@ -112,6 +123,7 @@ def getCandidateProfile(request):
         return JsonResponse({'error': 'User not found'}, status=404)
     except CandidateProfile.DoesNotExist:
         return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+
 
 @api_view(['POST'])
 def saveJob(request):
@@ -191,3 +203,128 @@ def removeSavedJob(request):
         return JsonResponse({'error': 'Job posting not found'}, status=404)
     except CandidateSavesJobPosting.DoesNotExist:
         return JsonResponse({'error': 'Saved job not found'}, status=404)
+
+@api_view(['POST'])
+def submitJobApplication(request):
+    job_title = request.data.get('job_title')
+    company_name = request.data.get('company_name')
+    job_id = request.data.get('job_id')
+    username = request.data.get('username')
+    email = request.data.get('email')
+    cover_letter = request.data.get('cover_letter')
+    resume = request.FILES.get('resume')
+
+    print("===============================")
+    print("job_title: ", job_title)
+    print("company_name: ", company_name)
+    print("job_id: ", job_id)
+    print("username: ", username)
+    print("email: ", email)
+    print("cover_letter: ", cover_letter)
+    print("resume: ", resume)
+    print("===============================")
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+        employer_profile = EmployerProfile.objects.get(company_name=company_name)
+        job_posting = JobPosting.objects.get(id=job_id, job_title=job_title, employer=employer_profile)
+
+        # Save the resume file if provided
+        resume_path = None
+        if resume:
+            resume_directory = os.path.join(settings.MEDIA_ROOT, 'jobApplicationResumes', f'{employer_profile.user.id}_{employer_profile.id}', f'{candidate_profile.user.id}_{candidate_profile.id}', f'{job_posting.id}')
+            os.makedirs(resume_directory, exist_ok=True)
+            resume_path = os.path.join(resume_directory, resume.name)
+            with open(resume_path, 'wb+') as destination:
+                for chunk in resume.chunks():
+                    destination.write(chunk)
+
+        # Create the application
+        application = Application.objects.create(
+            job=job_posting,
+            applicant=user,
+            cover_letter=cover_letter,
+            cv=resume_path,
+            status='submitted'
+        )
+
+        return JsonResponse({'message': 'Application submitted successfully.'}, status=201)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except EmployerProfile.DoesNotExist:
+        return JsonResponse({'error': 'Employer not found'}, status=404)
+    except JobPosting.DoesNotExist:
+        return JsonResponse({'error': 'Job posting not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+def getAppliedJobs(request):
+    email = request.GET.get('email')
+    username = request.GET.get('username')
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+        applications = Application.objects.filter(applicant=user)
+
+        applied_jobs = [
+            {
+                'id': application.job.id,
+                'job_title': application.job.job_title,
+                'company_name': application.job.employer.company_name if application.job.employer else '',
+                'status': application.status,
+                'date_time_applied': application.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            for application in applications
+        ]
+
+        return JsonResponse(applied_jobs, safe=False)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+
+@api_view(['POST'])
+def withdrawApplication(request):
+    job_title = request.data.get('job_title')
+    company_name = request.data.get('company_name')
+    job_id = request.data.get('job_id')
+    username = request.data.get('username')
+    email = request.data.get('email')
+
+
+    print("===============================")
+    print("job_title: ", job_title)
+    print("company_name: ", company_name)
+    print("job_id: ", job_id)
+    print("username: ", username)
+    print("email: ", email)
+    print("===============================")
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+        employer_profile = EmployerProfile.objects.get(company_name=company_name)
+        job_posting = JobPosting.objects.get(id=job_id, employer=employer_profile, job_title=job_title)
+
+        # Remove the application
+        application = Application.objects.get(job=job_posting, applicant=candidate_profile.user)
+        application.delete()
+
+        return JsonResponse({'message': 'Application withdrawn successfully'}, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except EmployerProfile.DoesNotExist:
+        return JsonResponse({'error': 'Employer not found'}, status=404)
+    except JobPosting.DoesNotExist:
+        return JsonResponse({'error': 'Job posting not found'}, status=404)
+    except Application.DoesNotExist:
+        return JsonResponse({'error': 'Application not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
