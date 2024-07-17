@@ -1,9 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, Application
+from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, Application, CandidateProfile, User, Qualification, WorkExperience
 from django.db.models import Q
-
+import base64
+from django.core.files.base import ContentFile
 
 @api_view(['GET'])
 def home(request):
@@ -72,55 +73,123 @@ def getJobPostings(request):
 
 @api_view(['GET'])
 def getJobDetails(request, job_id, username):
-    print("Job ID:", job_id)
-    print("Username:", username)
+    try:
+        print("Job ID:", job_id)
+        print("Username:", username)
 
-    # Get job based on job_id and and related employer
-    employer = EmployerProfile.objects.get(user__username=username)
-    job = JobPosting.objects.get(id=job_id, employer=employer)
-    print("Employer:", employer.company_name)
-    print("Job:", job.job_title)
+        # Get job based on job_id and related employer
+        employer = EmployerProfile.objects.get(user__username=username)
+        job = JobPosting.objects.get(id=job_id, employer=employer)
+        print("Employer:", employer.company_name)
+        print("Job:", job.job_title)
 
-    #get all Applications related to Job posting object
+        # Get all Applications related to Job posting object
+        applications = Application.objects.filter(job=job).select_related('applicant', 'applicant__candidateprofile')
 
-    applications = Application.objects.filter(job=job).values()
+        # Return response with fields from job object and list of applications
+        job_details = {
+            "job_title": job.job_title,
+            "job_description": job.job_description,
+            "requirements": job.requirements,
+            "location": job.location,
+            "compensation_amount": job.compensation_amount,
+            "compensation_type": job.compensation_type,
+            "job_type": job.job_type,
+            "employment_term": job.employment_term,
+            "status": job.status,
+            "ISL": job.ISL,
+            "skills": list(job.skills.values_list('skill_name', flat=True)),
+        }
 
-    
+        print("Job details:", job_details)
 
-    #return response with fields from job object and list of applications
-    job_details = {
-        "job_title": job.job_title,
-        "job_description": job.job_description,
-        "requirements": job.requirements,
-        "location": job.location,
-        "compensation_amount": job.compensation_amount,
-        "compensation_type": job.compensation_type,
-        "job_type": job.job_type,
-        "employment_term": job.employment_term,
-        "status": job.status,
-        "ISL": job.ISL,
-        "skills": list(job.skills.values_list('skill_name', flat=True)),
-    }
+        application_details = []
+        for application in applications:
+            candidate_profile = application.applicant.candidateprofile
+            profile_picture = None
+            if candidate_profile.profile_picture:
+                with open(candidate_profile.profile_picture.path, "rb") as image_file:
+                    profile_picture = base64.b64encode(image_file.read()).decode('utf-8')
+            application_details.append({
+                "id": application.id,
+                "full_name": candidate_profile.full_name,
+                "email": application.applicant.email,
+                "skills": list(candidate_profile.skills.values_list('skill_name', flat=True)),
+                "phone_number": candidate_profile.contact_phone,
+                "profile_picture": profile_picture,
+                "status": application.status,
+            })
 
-    print("Job details:", job_details)
+        print("Application details:", application_details)
 
-    application_details = []
-    for application in applications:
-        application_details.append({
-            "applicant": application['applicant_id'],
-            "cover_letter": application['cover_letter'],
-            "cv": application['cv'],
-            "status": application['status'],
-        })
+        response_data = {
+            "job_details": job_details,
+            "applications": application_details,
+        }
 
-    print("Application details:", application_details)
+        return Response(response_data)
+    except EmployerProfile.DoesNotExist:
+        return Response({"error": "Employer not found"}, status=404)
+    except JobPosting.DoesNotExist:
+        return Response({"error": "Job not found"}, status=404)
+    except Exception as e:
+        print("Error in getJobDetails:", str(e))
+        return Response({"error": str(e)}, status=500)
 
-    response_data = {
-        "job_details": job_details,
-        "applications": application_details,
-    }
-    
-    return Response(response_data)
+@api_view(['GET'])
+def getCandidateApplicationDetails(request, application_id):
+    try:
+        print("Application ID:", application_id)
+        application = Application.objects.get(id=application_id)
+        candidate_profile = application.applicant.candidateprofile
 
 
+        #pritn file name of cv
+        print("CV file name:", application.cv.name)
 
+        profile_picture = None
+        if candidate_profile.profile_picture:
+            with open(candidate_profile.profile_picture.path, "rb") as image_file:
+                profile_picture = base64.b64encode(image_file.read()).decode('utf-8')
+
+        qualifications = list(Qualification.objects.filter(candidate=candidate_profile).values())
+        work_experiences = list(WorkExperience.objects.filter(candidate=candidate_profile).values())
+
+        candidate_details = {
+            "full_name": candidate_profile.full_name,
+            "email": application.applicant.email,
+            "skills": list(candidate_profile.skills.values_list('skill_name', flat=True)),
+            "phone_number": candidate_profile.contact_phone,
+            "profile_picture": profile_picture,
+            "status": application.status,
+            "immigration_status": candidate_profile.immigration_status,
+            "accessibility_requirements": candidate_profile.accessibility_requirements,
+            "date_of_birth": candidate_profile.date_of_birth,
+            "emergency_contact_name": candidate_profile.emergency_contact_name,
+            "emergency_contact_phone": candidate_profile.emergency_contact_phone,
+            "linkedin_profile": candidate_profile.linkedin_profile,
+            "github_profile": candidate_profile.github_profile,
+            "summary": candidate_profile.summary,
+            "qualifications": qualifications,
+            "workExperiences": work_experiences,
+            "application": {
+                "id": application.id,
+                "cover_letter": application.cover_letter,
+                "cv_url": request.build_absolute_uri(application.cv.url) if application.cv else None,
+                "status": application.status,
+                "created_at": application.created_at,
+            }
+        }
+
+        print('cv_url:', candidate_details['application']['cv_url'])
+
+        print("Returning response....")
+
+        return Response(candidate_details)
+    except Application.DoesNotExist:
+        return Response({"error": "Application not found"}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return Response({"error": "Candidate profile not found"}, status=404)
+    except Exception as e:
+        print("Error in getCandidateApplicationDetails:", str(e))
+        return Response({"error": str(e)}, status=500)

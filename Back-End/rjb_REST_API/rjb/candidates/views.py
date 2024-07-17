@@ -246,7 +246,7 @@ def submitJobApplication(request):
             applicant=user,
             cover_letter=cover_letter,
             cv=resume_path,
-            status='submitted'
+            status='Submitted'
         )
 
         return JsonResponse({'message': 'Application submitted successfully.'}, status=201)

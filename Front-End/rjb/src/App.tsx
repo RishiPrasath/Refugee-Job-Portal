@@ -6,7 +6,8 @@ import Home from './components/Home/Home';
 import NavBar from './components/NavBar/NavBar';
 import ViewJobPostings from './components/roles/Employer/ViewJobPostings';
 import AddJobPostings from './components/roles/Employer/AddJobPostings';
-import EmployerJobPosting from './components/roles/Employer/JobPosting'; // Renamed to avoid confusion
+import JobPosting from './components/roles/Employer/JobPosting';
+import JobApplicationControl from './components/roles/Employer/JobApplicationControl'; // Import the JobApplicationControl component
 import ViewCandidates from './components/roles/CaseWorker/ViewCandidates';
 import DisplayCandidate from './components/roles/CaseWorker/DisplayCandidate';
 import SearchJobPostings from './components/roles/Candidate/searchJobPostings';
@@ -27,11 +28,12 @@ const App = () => {
                     <Route path="/home" element={<Home />} />
                     <Route path="/viewjobpostings" element={<ViewJobPostings />} />
                     <Route path="/addjobpostings" element={<AddJobPostings />} />
-                    <Route path="/jobposting/:company/:jobId" element={<EmployerJobPosting />} /> {/* Renamed to avoid confusion */}
+                    <Route path="/jobposting/:company/:jobId" element={<JobPosting />} />
+                    <Route path="/jobapplication/:applicationId" element={<JobApplicationControl />} /> {/* New route for JobApplicationControl */}
                     <Route path="/viewcandidates" element={<ViewCandidates />} />
                     <Route path="/candidate/:email" element={<DisplayCandidate />} />
                     <Route path="/searchjobpostings" element={<SearchJobPostings />} />
-                    <Route path="/candidate-job-view/:company/:jobId" element={<CandidateJobPosting />} /> {/* Updated to correct component */}
+                    <Route path="/candidate-job-view/:company/:jobId" element={<CandidateJobPosting />} />
                     <Route path="/profile" element={<CandidateProfile />} />
                     <Route path="/applyForJob/:company/:jobTitle/:jobId" element={<ApplyForJob />} />
                     <Route path="/candidateProfile" element={<CandidateProfile />} /> {/* Add the CandidateProfile route */}

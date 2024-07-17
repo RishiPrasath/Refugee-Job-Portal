@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Grid, Chip } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { Box, Typography, Card, CardContent, Grid, Chip, Avatar } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useGlobalState } from '../../../globalState/globalState';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WorkIcon from '@mui/icons-material/Work';
 import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound';
 import InfoIcon from '@mui/icons-material/Info';
+import EmailIcon from '@mui/icons-material/Email';
+import PhoneIcon from '@mui/icons-material/Phone';
+import SkillsIcon from '@mui/icons-material/Build'; // Assuming Build icon for skills
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'; // Assuming AssignmentTurnedIn icon for status
 
 // Define an interface for the job details
 interface JobDetails {
@@ -20,27 +24,171 @@ interface JobDetails {
   status: string;
   ISL: boolean;
   skills: string[];
+  salary?: string; // Add this line if salary is needed
 }
 
+// Define default job details
+const defaultJobDetails: JobDetails = {
+  job_title: '',
+  job_description: '',
+  requirements: '',
+  location: '',
+  compensation_amount: 0,
+  compensation_type: '',
+  job_type: '',
+  employment_term: '',
+  status: '',
+  ISL: false,
+  skills: []
+};
+
+interface ApplicationDetails {
+  id: number;
+  full_name: string;
+  email: string;
+  skills: string[];
+  phone_number: string;
+  profile_picture: string | null;
+  status: string;
+}
+
+// JobDetailsCard component
+const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) => {
+  const requirementsList = jobDetails.requirements
+    ? jobDetails.requirements.split('|').filter(req => req.trim() !== '')
+    : [];
+
+  return (
+    <Card>
+      <CardContent>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h5" gutterBottom>
+              {jobDetails.job_title}
+            </Typography>
+            <Box display="flex" alignItems="flex-start">
+              <InfoIcon sx={{ verticalAlign: 'top', mr: 1 }} />
+              <Typography variant="body1" paragraph>
+                {jobDetails.job_description}
+              </Typography>
+            </Box>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Requirements
+            </Typography>
+            <ul>
+              {requirementsList.map((requirement, index) => (
+                <li key={index}>
+                  <Typography variant="body1">{requirement.trim()}</Typography>
+                </li>
+              ))}
+            </ul>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <LocationOnIcon sx={{ verticalAlign: 'middle' }} /> <strong>Location</strong>
+            </Typography>
+            <Typography variant="body1">
+              {jobDetails.location}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <CurrencyPoundIcon sx={{ verticalAlign: 'middle' }} /> <strong>Compensation</strong>
+            </Typography>
+            <Typography variant="body1">
+              £{jobDetails.compensation_amount} ({jobDetails.compensation_type})
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <WorkIcon sx={{ verticalAlign: 'middle' }} /> <strong>Job Type</strong>
+            </Typography>
+            <Typography variant="body1">
+              {jobDetails.job_type}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <InfoIcon sx={{ verticalAlign: 'middle' }} /> <strong>Employment Term</strong>
+            </Typography>
+            <Typography variant="body1">
+              {jobDetails.employment_term}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="body1">
+              <SkillsIcon sx={{ verticalAlign: 'middle' }} /> <strong>Skills</strong>
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              {jobDetails.skills.map((skill, index) => (
+                <Chip key={index} label={skill} color="primary" />
+              ))}
+            </Box>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
+
+// ApplicationCard component
+const ApplicationCard: React.FC<{ application: ApplicationDetails; onClick: () => void }> = ({ application, onClick }) => (
+  <Card onClick={onClick} sx={{ cursor: 'pointer' }}>
+    <CardContent>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+          {application.full_name}
+        </Typography>
+        {application.profile_picture && (
+          <Avatar
+            src={`data:image/jpeg;base64,${application.profile_picture}`}
+            alt={application.full_name}
+            sx={{ width: 56, height: 56 }}
+          />
+        )}
+      </Box>
+      <Typography variant="body1" paragraph>
+        <EmailIcon sx={{ verticalAlign: 'middle', mr: 1 }} /> <strong>Email</strong>
+      </Typography>
+      <Typography variant="body1" sx={{ mb: 2 }}>
+        {application.email}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        <PhoneIcon sx={{ verticalAlign: 'middle', mr: 1 }} /> <strong>Phone Number</strong>
+      </Typography>
+      <Typography variant="body1" sx={{ mb: 2 }}>
+        {application.phone_number}
+      </Typography>
+      <Typography variant="body1" paragraph>
+        <SkillsIcon sx={{ verticalAlign: 'middle', mr: 1 }} /> <strong>Skills</strong>
+      </Typography>
+      <Box display="flex" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
+        {application.skills.map((skill, index) => (
+          <Chip key={index} label={skill} color="primary" />
+        ))}
+      </Box>
+      <Typography variant="body1" paragraph>
+        <AssignmentTurnedInIcon sx={{ verticalAlign: 'middle', mr: 1 }} /> <strong>Status</strong>
+      </Typography>
+      <Chip label={application.status} variant="outlined" color="default" />
+    </CardContent>
+  </Card>
+);
+
+// JobPosting component
 const JobPosting: React.FC = () => {
-  // Initialize jobDetails with default values that match the JobDetails interface
-  const defaultJobDetails: JobDetails = {
-    job_title: '',
-    job_description: '',
-    requirements: '',  // Ensure this is a string to avoid undefined issues
-    location: '',
-    compensation_amount: 0,
-    compensation_type: '',
-    job_type: '',
-    employment_term: '',
-    status: '',
-    ISL: false,
-    skills: []
-  };
   const [jobDetails, setJobDetails] = useState<JobDetails>(defaultJobDetails);
-  const { jobId } = useParams<{ jobId: string }>(); // Removed username from here
-  const { username } = useGlobalState(); // Continue using username from global state
+  const [applications, setApplications] = useState<ApplicationDetails[]>([]);
+  const navigate = useNavigate();
+  const { jobId } = useParams<{ jobId: string }>();
+  const { username } = useGlobalState();
+
   useEffect(() => {
+    console.log("jobId: ", jobId);
+    console.log("username: ", username);
+
     const fetchJobDetails = async () => {
       try {
         const url = `http://localhost:8000/employers/getJobDetails/${jobId}/${username}`;
@@ -51,6 +199,7 @@ const JobPosting: React.FC = () => {
         const data = await response.json();
         console.log(data);
         setJobDetails(data.job_details);
+        setApplications(data.applications);
       } catch (error) {
         console.error('Failed to fetch job details:', error);
       }
@@ -59,85 +208,26 @@ const JobPosting: React.FC = () => {
     fetchJobDetails();
   }, [jobId, username]);
 
-  // Split the requirements string into an array, only if it exists
-  const requirementsList = jobDetails.requirements
-    ? jobDetails.requirements.split('|').filter(req => req.trim() !== '')
-    : [];
+  const handleCardClick = (application: ApplicationDetails) => {
+    navigate(`/jobapplication/${application.id}`);
+  };
 
   return (
     <Box p={3}>
       <Typography variant="h4" gutterBottom>
         Job Posting Details
       </Typography>
-      <Card>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="h5" gutterBottom>
-                {jobDetails.job_title}
-              </Typography>
-              <Box display="flex" alignItems="center">
-                <InfoIcon sx={{ verticalAlign: 'middle', mr: 1 }} />
-                <Typography variant="body1" paragraph>
-                  {jobDetails.job_description}
-                </Typography>
-              </Box>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Requirements:
-              </Typography>
-              <ul>
-                {requirementsList.map((requirement, index) => (
-                  <li key={index}>
-                    <Typography variant="body1">{requirement.trim()}</Typography>
-                  </li>
-                ))}
-              </ul>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <LocationOnIcon sx={{ verticalAlign: 'middle' }} /> <strong>Location:</strong> {jobDetails.location}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <CurrencyPoundIcon sx={{ verticalAlign: 'middle' }} /> <strong>Compensation:</strong> £{jobDetails.compensation_amount} ({jobDetails.compensation_type})
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <WorkIcon sx={{ verticalAlign: 'middle' }} /> <strong>Job Type:</strong> {jobDetails.job_type}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <strong>Employment Term:</strong> {jobDetails.employment_term}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1">
-                <strong>Status:</strong> {jobDetails.status}
-              </Typography>
-            </Grid>
-            {jobDetails.ISL && (
-              <Grid item xs={12}>
-                <Chip color="primary" label="Immigration Salary List" />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                Skills:
-              </Typography>
-              <Box display="flex" flexWrap="wrap" gap={1}>
-                {jobDetails.skills.map((skill, index) => (
-                  <Chip key={index} label={skill} color="primary" />
-                ))}
-              </Box>
-            </Grid>
+      <JobDetailsCard jobDetails={jobDetails} />
+      <Typography variant="h4" gutterBottom mt={4}>
+        Job Applications
+      </Typography>
+      <Grid container spacing={2}>
+        {applications.map((application, index) => (
+          <Grid item xs={12} sm={6} key={index}>
+            <ApplicationCard application={application} onClick={() => handleCardClick(application)} />
           </Grid>
-        </CardContent>
-      </Card>
+        ))}
+      </Grid>
     </Box>
   );
 }

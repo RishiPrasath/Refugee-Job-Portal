@@ -50,7 +50,7 @@ const ViewJobPostings: React.FC = () => {
       <Grid container spacing={2} justifyContent="center">
         {jobPostings.map((job, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ minWidth: 275 }} onClick={() => navigate(`/jobposting/${job.id}/${username}`)}>
+            <Card sx={{ minWidth: 275 }} onClick={() => navigate(`/jobposting/${username}/${job.id}`)}>
               <CardContent>
                 <Typography variant="h6" component="div" gutterBottom>
                   {job.job_title}
