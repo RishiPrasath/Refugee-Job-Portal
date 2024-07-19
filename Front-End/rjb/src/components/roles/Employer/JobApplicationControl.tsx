@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Typography, Box, Grid, Avatar, Chip, Card, CardContent, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EmailIcon from '@mui/icons-material/Email';
@@ -15,6 +15,10 @@ import InfoIcon from '@mui/icons-material/Info';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import SaveIcon from '@mui/icons-material/Save';
+import DescriptionIcon from '@mui/icons-material/Description';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import EventIcon from '@mui/icons-material/Event';
 
 interface CandidateProfile {
   full_name: string;
@@ -69,7 +73,7 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
       <Typography variant="h5">Candidate Profile</Typography>
     </AccordionSummary>
     <AccordionDetails>
-      <Card>
+      <Card elevation={3} sx={{ borderRadius: '8px' }}>
         <CardContent>
           <Grid container spacing={2}>
             <Grid item xs={12} sm={4} display="flex" justifyContent="center" alignItems="center">
@@ -112,69 +116,51 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
             </Grid>
           </Grid>
           <Box mt={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <SkillIcon style={{ marginRight: '8px' }} /> Skills
+            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <SkillIcon style={{ marginRight: '8px' }} /> Skills
+            </Typography>
+            <Box display="flex" flexWrap="wrap" gap={1}>
+              {profile.skills.map((skill, index) => (
+                <Chip key={index} label={skill} style={{ backgroundColor: 'green', color: 'white' }} />
+              ))}
+            </Box>
+          </Box>
+          <Box mt={3}>
+            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <SchoolIcon style={{ marginRight: '8px' }} /> Qualifications
+            </Typography>
+            {profile.qualifications.map(qualification => (
+              <Box key={qualification.id} mb={2} p={2} sx={{ backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                <Typography variant="body2">
+                  <strong>{qualification.school}</strong>, {qualification.qualification} ({qualification.start_year} - {qualification.end_year})
                 </Typography>
-                <Box display="flex" flexWrap="wrap" gap={1}>
-                  {profile.skills.map((skill, index) => (
-                    <Chip key={index} label={skill} style={{ backgroundColor: 'green', color: 'white' }} />
-                  ))}
+              </Box>
+            ))}
+          </Box>
+          <Box mt={3}>
+            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+              <WorkIcon style={{ marginRight: '8px' }} /> Work Experiences
+            </Typography>
+            {profile.workExperiences.map(experience => (
+              <Box key={experience.id} mb={2} p={2} sx={{ backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+                <Box display="flex" mb={1}>
+                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Company:</strong></Typography>
+                  <Typography variant="body2">{experience.company}</Typography>
                 </Box>
-              </CardContent>
-            </Card>
-          </Box>
-          <Box mt={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <SchoolIcon style={{ marginRight: '8px' }} /> Qualifications
-                </Typography>
-                {profile.qualifications.map(qualification => (
-                  <Card key={qualification.id} variant="elevation" elevation={3} style={{ marginBottom: '10px', borderRadius: '8px' }}>
-                    <CardContent>
-                      <Typography variant="body2">
-                        <strong>{qualification.school}</strong>, {qualification.qualification} ({qualification.start_year} - {qualification.end_year})
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                ))}
-              </CardContent>
-            </Card>
-          </Box>
-          <Box mt={3}>
-            <Card>
-              <CardContent>
-                <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-                  <WorkIcon style={{ marginRight: '8px' }} /> Work Experiences
-                </Typography>
-                {profile.workExperiences.map(experience => (
-                  <Box key={experience.id} mb={2}>
-                    <Card variant="elevation" elevation={3} style={{ marginBottom: '10px', borderRadius: '8px' }}>
-                      <CardContent>
-                        <Box display="flex" mb={1}>
-                          <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Company:</strong></Typography>
-                          <Typography variant="body2">{experience.company}</Typography>
-                        </Box>
-                        <Box display="flex" mb={1}>
-                          <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Role:</strong></Typography>
-                          <Typography variant="body2">{experience.role}</Typography>
-                        </Box>
-                        <Box display="flex" mb={1}>
-                          <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Years:</strong></Typography>
-                          <Typography variant="body2">{experience.start_year} - {experience.end_year}</Typography>
-                        </Box>
-                        <Box display="flex" mb={1}>
-                          <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Description:</strong></Typography>
-                          <Typography variant="body2">{experience.description}</Typography>
-                        </Box>
-                      </CardContent>
-                    </Card>
-                  </Box>
-                ))}
-              </CardContent>
-            </Card>
+                <Box display="flex" mb={1}>
+                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Role:</strong></Typography>
+                  <Typography variant="body2">{experience.role}</Typography>
+                </Box>
+                <Box display="flex" mb={1}>
+                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Years:</strong></Typography>
+                  <Typography variant="body2">{experience.start_year} - {experience.end_year}</Typography>
+                </Box>
+                <Box display="flex" mb={1}>
+                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Description:</strong></Typography>
+                  <Typography variant="body2">{experience.description}</Typography>
+                </Box>
+              </Box>
+            ))}
           </Box>
         </CardContent>
       </Card>
@@ -192,66 +178,88 @@ const ApplicationCard: React.FC<{ application: Application }> = ({ application }
   return (
     <Card>
       <CardContent>
-        <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-          Application Details
-        </Typography>
         <Box display="flex" flexDirection="column" gap={1}>
-          <Typography variant="body2"><strong>Application ID:</strong> {application.id}</Typography>
-          <Typography variant="body2"><strong>Cover Letter:</strong> {application.cover_letter}</Typography>
+          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
+            <DescriptionIcon style={{ marginRight: '8px' }} /> Cover Letter
+          </Typography>
+          <Typography variant="body2">{application.cover_letter}</Typography>
+          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
+            <AssignmentTurnedInIcon style={{ marginRight: '8px' }} /> Status
+          </Typography>
+          <Typography variant="body2">{application.status}</Typography>
+          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
+            <EventIcon style={{ marginRight: '8px' }} /> Application Date
+          </Typography>
+          <Typography variant="body2">{new Date(application.created_at).toLocaleString()}</Typography>
           {application.cv_url && (
-            <Typography variant="body2">
-              <strong>CV:</strong> <Button variant="contained" color="primary" onClick={openInNewTab}>Download CV</Button>
-            </Typography>
+            <Box mt={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<SaveIcon />}
+                onClick={openInNewTab}
+                fullWidth
+              >
+                Download CV
+              </Button>
+            </Box>
           )}
-          <Typography variant="body2"><strong>Status:</strong> {application.status}</Typography>
-          <Typography variant="body2"><strong>Created At:</strong> {new Date(application.created_at).toLocaleString()}</Typography>
         </Box>
       </CardContent>
     </Card>
   );
 };
 
-const ActionButtons: React.FC = () => (
-  <Card>
-    <CardContent>
-      <Box mt={3}>
-        <Grid container spacing={1}>
-          <Grid item xs={12} sm={4}>
-            <Button
-              variant="contained"
-              color="success"
-              startIcon={<CheckIcon />}
-              fullWidth
-              sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' } ,marginBottom:'10px' }}
-            >
-              Approve
-            </Button>
+const ActionButtons: React.FC<{ applicationId: string }> = ({ applicationId }) => {
+  const navigate = useNavigate();
+
+  const handleInterviewClick = () => {
+    navigate(`/create-interview/${applicationId}`);
+  };
+
+  return (
+    <Card>
+      <CardContent>
+        <Box mt={3}>
+          <Grid container spacing={1}>
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                color="success"
+                startIcon={<CheckIcon />}
+                fullWidth
+                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
+              >
+                Approve
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<CloseIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
+                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
+              >
+                Reject
+              </Button>
+            </Grid>
+            <Grid item xs={12} sm={4}>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<CalendarTodayIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
+                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
+                onClick={handleInterviewClick}
+              >
+                Interview
+              </Button>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<CloseIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
-              sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' } ,marginBottom:'10px' }}
-            >
-              Reject
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<CalendarTodayIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
-              sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' } ,marginBottom:'10px' }}
-            >
-              Interview
-            </Button>
-          </Grid>
-        </Grid>
-      </Box>
-    </CardContent>
-  </Card>
-);
+        </Box>
+      </CardContent>
+    </Card>
+  );
+};
 
 const JobApplicationControl: React.FC = () => {
   const { applicationId } = useParams<{ applicationId: string }>();
@@ -294,7 +302,7 @@ const JobApplicationControl: React.FC = () => {
             <ApplicationCard application={profile.application} />
           </Box>
           <Box mt={3}>
-            <ActionButtons />
+            <ActionButtons applicationId={applicationId || ''} />
           </Box>
         </Box>
       ) : (

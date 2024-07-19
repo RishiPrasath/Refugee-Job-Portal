@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.db.models import Q
-from rjb.models import JobPosting, EmployerProfile , CandidateProfile, User, CandidateSavesJobPosting, Application
+from rjb.models import *
 import base64
 import os
 from django.conf import settings
@@ -312,7 +312,7 @@ def withdrawApplication(request):
         job_posting = JobPosting.objects.get(id=job_id, employer=employer_profile, job_title=job_title)
 
         # Remove the application
-        application = Application.objects.get(job=job_posting, applicant=candidate_profile.user)
+        application = Application.objects.get(job=job_posting, applicant=user)
         application.delete()
 
         return JsonResponse({'message': 'Application withdrawn successfully'}, status=200)
@@ -328,3 +328,42 @@ def withdrawApplication(request):
         return JsonResponse({'error': 'Application not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+def getCandidateUpcomingInterviews(request):
+    email = request.GET.get('email')
+    username = request.GET.get('username')
+
+    print("===============================")
+    print("email: ", email)
+    print("username: ", username)
+    print("===============================")
+
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+        applications = Application.objects.filter(applicant=user)
+        interviews = Interview.objects.filter(application__in=applications)
+
+        interview_data = [
+            {
+                'id': interview.id,
+                'interview_type': interview.interview_type,
+                'date': interview.date,
+                'start_time': interview.start_time,
+                'end_time': interview.end_time,
+                'interview_location': interview.interview_location,
+                'meeting_link': interview.meeting_link,
+                'additional_details': interview.additional_details,
+                'status': interview.status,
+            }
+            for interview in interviews
+        ]
+
+        return JsonResponse(interview_data, safe=False)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)

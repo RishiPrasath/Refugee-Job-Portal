@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.views.decorators.csrf import csrf_exempt
-from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, Application, CandidateProfile, User, Qualification, WorkExperience
+from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, Application, CandidateProfile, User, Qualification, WorkExperience, Interview
 from django.db.models import Q
 import base64
 from django.core.files.base import ContentFile
@@ -192,4 +192,54 @@ def getCandidateApplicationDetails(request, application_id):
         return Response({"error": "Candidate profile not found"}, status=404)
     except Exception as e:
         print("Error in getCandidateApplicationDetails:", str(e))
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def createInterview(request):
+    try:
+        data = request.data
+        print("Received data:", data)  # Debug print to check what data is received
+
+        application_id = data.get('applicationId')
+        if not application_id:
+            return Response({"message": "Application ID is required"}, status=400)
+
+        try:
+            application = Application.objects.get(id=application_id)
+        except Application.DoesNotExist:
+            return Response({"message": "Application not found"}, status=404)
+
+        interview = Interview(
+            application=application,
+            interview_type=data.get('interviewType'),
+            date=data.get('date'),
+            start_time=data.get('startTime'),
+            end_time=data.get('endTime'),
+            interview_location=data.get('interviewLocation'),
+            meeting_link=data.get('meetingLink'),
+            additional_details=data.get('additionalDetails'),
+            status=data.get('status')
+        )
+        interview.save()
+
+        return Response({"message": "Interview created successfully", "interview": interview.id}, status=201)
+    except Exception as e:
+        print("Error in createInterview:", str(e))  # Debug print to check the error
+        return Response({"message": "An error occurred", "error": str(e)}, status=500)
+
+@api_view(['GET'])
+def getUpcomingInterviews(request):
+    email = request.query_params.get('email')
+    company_name = request.query_params.get('company_name')
+
+    try:
+        employer = EmployerProfile.objects.get(user__email=email, company_name=company_name)
+        job_postings = JobPosting.objects.filter(employer=employer)
+        applications = Application.objects.filter(job__in=job_postings)
+        interviews = Interview.objects.filter(application__in=applications).values()
+
+        return Response({"interviews": list(interviews)}, status=200)
+    except EmployerProfile.DoesNotExist:
+        return Response({"error": "Employer not found"}, status=404)
+    except Exception as e:
         return Response({"error": str(e)}, status=500)

@@ -86,7 +86,7 @@ const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) =>
             </ul>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mb: 1 }}>
               <LocationOnIcon sx={{ verticalAlign: 'middle' }} /> <strong>Location</strong>
             </Typography>
             <Typography variant="body1">
@@ -94,7 +94,7 @@ const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) =>
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mb: 1 }}>
               <CurrencyPoundIcon sx={{ verticalAlign: 'middle' }} /> <strong>Compensation</strong>
             </Typography>
             <Typography variant="body1">
@@ -102,7 +102,7 @@ const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) =>
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mb: 1 }}>
               <WorkIcon sx={{ verticalAlign: 'middle' }} /> <strong>Job Type</strong>
             </Typography>
             <Typography variant="body1">
@@ -110,7 +110,7 @@ const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) =>
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mb: 1 }}>
               <InfoIcon sx={{ verticalAlign: 'middle' }} /> <strong>Employment Term</strong>
             </Typography>
             <Typography variant="body1">
@@ -118,7 +118,7 @@ const JobDetailsCard: React.FC<{ jobDetails: JobDetails }> = ({ jobDetails }) =>
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="body1">
+            <Typography variant="body1" sx={{ mb: 2 }}>
               <SkillsIcon sx={{ verticalAlign: 'middle' }} /> <strong>Skills</strong>
             </Typography>
             <Box display="flex" flexWrap="wrap" gap={1}>
@@ -138,14 +138,14 @@ const ApplicationCard: React.FC<{ application: ApplicationDetails; onClick: () =
   <Card onClick={onClick} sx={{ cursor: 'pointer' }}>
     <CardContent>
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem' }}>
+        <Typography variant="h6" component="div" sx={{ fontWeight: 'bold', fontSize: '1.25rem', mb: 2 }}>
           {application.full_name}
         </Typography>
         {application.profile_picture && (
           <Avatar
             src={`data:image/jpeg;base64,${application.profile_picture}`}
             alt={application.full_name}
-            sx={{ width: 56, height: 56 }}
+            sx={{ width: 77, height: 77 }}
           />
         )}
       </Box>
@@ -166,7 +166,7 @@ const ApplicationCard: React.FC<{ application: ApplicationDetails; onClick: () =
       </Typography>
       <Box display="flex" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
         {application.skills.map((skill, index) => (
-          <Chip key={index} label={skill} color="primary" />
+          <Chip key={index} label={skill} color="success" />
         ))}
       </Box>
       <Typography variant="body1" paragraph>

@@ -7,13 +7,16 @@ import NavBar from './components/NavBar/NavBar';
 import ViewJobPostings from './components/roles/Employer/ViewJobPostings';
 import AddJobPostings from './components/roles/Employer/AddJobPostings';
 import JobPosting from './components/roles/Employer/JobPosting';
-import JobApplicationControl from './components/roles/Employer/JobApplicationControl'; // Import the JobApplicationControl component
+import JobApplicationControl from './components/roles/Employer/JobApplicationControl';
+import CreateInterview from './components/roles/Employer/CreateInterview';
 import ViewCandidates from './components/roles/CaseWorker/ViewCandidates';
 import DisplayCandidate from './components/roles/CaseWorker/DisplayCandidate';
 import SearchJobPostings from './components/roles/Candidate/searchJobPostings';
-import CandidateJobPosting from './components/roles/Candidate/JobPosting'; 
-import CandidateProfile from './components/roles/Candidate/CandidateProfile'; // Import the CandidateProfile component
-import ApplyForJob from './components/roles/Candidate/ApplyForJob'; 
+import CandidateJobPosting from './components/roles/Candidate/JobPosting';
+import CandidateProfile from './components/roles/Candidate/CandidateProfile';
+import ApplyForJob from './components/roles/Candidate/ApplyForJob';
+import UpcomingInterviews from './components/roles/Employer/UpcomingInterviews';
+import CandidateUpcomingInterviews from './components/roles/Candidate/UpcomingInterviews'; // Import the CandidateUpcomingInterviews component
 import { GlobalStateProvider } from './globalState/globalState';
 import './App.css';
 
@@ -29,14 +32,17 @@ const App = () => {
                     <Route path="/viewjobpostings" element={<ViewJobPostings />} />
                     <Route path="/addjobpostings" element={<AddJobPostings />} />
                     <Route path="/jobposting/:company/:jobId" element={<JobPosting />} />
-                    <Route path="/jobapplication/:applicationId" element={<JobApplicationControl />} /> {/* New route for JobApplicationControl */}
+                    <Route path="/jobapplication/:applicationId" element={<JobApplicationControl />} />
+                    <Route path="/create-interview/:applicationId" element={<CreateInterview />} />
                     <Route path="/viewcandidates" element={<ViewCandidates />} />
                     <Route path="/candidate/:email" element={<DisplayCandidate />} />
                     <Route path="/searchjobpostings" element={<SearchJobPostings />} />
                     <Route path="/candidate-job-view/:company/:jobId" element={<CandidateJobPosting />} />
                     <Route path="/profile" element={<CandidateProfile />} />
                     <Route path="/applyForJob/:company/:jobTitle/:jobId" element={<ApplyForJob />} />
-                    <Route path="/candidateProfile" element={<CandidateProfile />} /> {/* Add the CandidateProfile route */}
+                    <Route path="/candidateProfile" element={<CandidateProfile />} />
+                    <Route path="/upcoming-interviews" element={<UpcomingInterviews />} />
+                    <Route path="/candidate-upcoming-interviews" element={<CandidateUpcomingInterviews />} /> {/* New route for CandidateUpcomingInterviews */}
                 </Routes>
             </Router>
         </GlobalStateProvider>

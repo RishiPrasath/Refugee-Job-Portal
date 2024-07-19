@@ -188,13 +188,21 @@ class Application(models.Model):
 class Interview(models.Model):
     # Foreign key linking to the Application model
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
-    # Foreign key linking to the User model (interviewer)
-    interviewer = models.ForeignKey(User, on_delete=models.CASCADE)
-    # Timestamp of when the interview is scheduled
-    scheduled_at = models.DateTimeField(null=True, blank=True)
+    # Type of interview (e.g., in-person, virtual)
+    interview_type = models.CharField(max_length=50)
+    # Date of the interview
+    date = models.DateField(null=True, blank=True)
+    # Start time of the interview
+    start_time = models.TimeField(null=True, blank=True)
+    # End time of the interview
+    end_time = models.TimeField(null=True, blank=True)
     # Location of the interview
     interview_location = models.CharField(max_length=255, null=True, blank=True)
-    # Status of the interview (e.g., scheduled, completed, canceled)
+    # Meeting link for virtual interviews
+    meeting_link = models.URLField(null=True, blank=True)
+    # Additional details for the interview
+    additional_details = models.TextField(null=True, blank=True)
+    # Status of the interview (e.g., scheduled, confirmed, rescheduled, completed, canceled)
     status = models.CharField(max_length=50)
     # Feedback from the interview
     feedback = models.TextField(null=True, blank=True)

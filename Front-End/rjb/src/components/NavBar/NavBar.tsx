@@ -58,10 +58,16 @@ const NavBar: React.FC = () => {
             <ListItemText primary="Home" />
           </ListItem>
           {userType === 'Employer' && (
-            <ListItem button component={Link} to="/viewjobpostings">
-              <WorkIcon style={{ marginRight: '0.5rem' }} />
-              <ListItemText primary="View Job Postings" />
-            </ListItem>
+            <>
+              <ListItem button component={Link} to="/viewjobpostings">
+                <WorkIcon style={{ marginRight: '0.5rem' }} />
+                <ListItemText primary="View Job Postings" />
+              </ListItem>
+              <ListItem button component={Link} to="/upcoming-interviews">
+                <WorkIcon style={{ marginRight: '0.5rem' }} />
+                <ListItemText primary="Upcoming Interviews" />
+              </ListItem>
+            </>
           )}
           {userType === 'Case Worker' && (
             <ListItem button component={Link} to="/viewcandidates">
@@ -74,6 +80,10 @@ const NavBar: React.FC = () => {
               <ListItem button component={Link} to="/searchjobpostings">
                 <WorkIcon style={{ marginRight: '0.5rem' }} />
                 <ListItemText primary="Search Job Postings" />
+              </ListItem>
+              <ListItem button component={Link} to="/candidate-upcoming-interviews">
+                <WorkIcon style={{ marginRight: '0.5rem' }} />
+                <ListItemText primary="Upcoming Interviews" />
               </ListItem>
               <ListItem button component={Link} to="/profile">
                 <AccountCircleIcon style={{ marginRight: '0.5rem' }} />
@@ -132,10 +142,16 @@ const NavBar: React.FC = () => {
                     Home
                   </Button>
                   {userType === 'Employer' && (
-                    <Button color="inherit" component={Link} to="/viewjobpostings" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
-                      <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
-                      View Job Postings
-                    </Button>
+                    <>
+                      <Button color="inherit" component={Link} to="/viewjobpostings" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
+                        <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        View Job Postings
+                      </Button>
+                      <Button color="inherit" component={Link} to="/upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
+                        <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        Upcoming Interviews
+                      </Button>
+                    </>
                   )}
                   {userType === 'Case Worker' && (
                     <Button color="inherit" component={Link} to="/viewcandidates" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
@@ -148,6 +164,10 @@ const NavBar: React.FC = () => {
                       <Button color="inherit" component={Link} to="/searchjobpostings" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
                         <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
                         Search Job Postings
+                      </Button>
+                      <Button color="inherit" component={Link} to="/candidate-upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
+                        <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        Upcoming Interviews
                       </Button>
                       <Button color="inherit" component={Link} to="/profile" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
                         <AccountCircleIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />

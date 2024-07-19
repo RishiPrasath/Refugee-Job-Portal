@@ -1,0 +1,24 @@
+
+[
+
+{
+    "applicationId": "1",
+    "interviewType": "in-person",
+    "date": "2023-12-15",
+    "startTime": "10:00:00",
+    "endTime": "11:00:00",
+    "interviewLocation": "123 Tech Street, London, UK",
+    "additionalDetails": "Please bring your ID and resume.",
+    "status": "Scheduled"
+  },
+  {
+    "applicationId": "2",
+    "interviewType": "virtual",
+    "date": "2023-12-16",
+    "startTime": "14:00:00",
+    "endTime": "15:00:00",
+    "meetingLink": "https://zoom.us/j/1234567890?pwd=abcdefghijklmno",
+    "additionalDetails": "Please join the meeting 5 minutes early.",
+    "status": "Scheduled"
+  }
+]
