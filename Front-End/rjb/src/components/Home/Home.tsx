@@ -11,6 +11,7 @@ const Home: React.FC<Props> = () => {
     username, 
     email, 
     profile_picture, 
+    company_logo, 
     skills, 
     accessibility_requirements, 
     immigration_status, 
@@ -26,21 +27,34 @@ const Home: React.FC<Props> = () => {
       username,
       email,
       profile_picture,
+      company_logo,
       skills,
       accessibility_requirements,
       immigration_status,
       assigned_case_worker // Ensure this is logged
     });
-  }, [full_name, userType, company_name, username, email, profile_picture, skills, accessibility_requirements, immigration_status, assigned_case_worker]);
+  }, [full_name, userType, company_name, username, email, profile_picture, company_logo, skills, accessibility_requirements, immigration_status, assigned_case_worker]);
 
   return (
     <div>
       <h1>Home Page</h1>
       {userType === 'Employer' ? (
-        <p>
-          Your company is: {company_name} <br/>
-          Your role is: {userType}
-        </p>
+        <div>
+          <p>
+            Your company is: {company_name} <br/>
+            Your role is: {userType}
+          </p>
+          {company_logo && (
+            <div>
+              <img 
+                src={`data:image/jpeg;base64,${company_logo}`} 
+                alt="Company Logo" 
+                width="300" 
+                height="300" 
+              />
+            </div>
+          )}
+        </div>
       ) : (
         <>
           <p>Welcome, {full_name}!</p>

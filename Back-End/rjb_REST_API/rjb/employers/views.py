@@ -5,6 +5,8 @@ from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, App
 from django.db.models import Q
 import base64
 from django.core.files.base import ContentFile
+from django.utils import timezone
+from datetime import datetime, time
 
 @api_view(['GET'])
 def home(request):
@@ -162,7 +164,7 @@ def getCandidateApplicationDetails(request, application_id):
             "phone_number": candidate_profile.contact_phone,
             "profile_picture": profile_picture,
             "status": application.status,
-            "immigration_status": candidate_profile.immigration_status,
+            "immigration_status": candidate_profile.imigration_status,
             "accessibility_requirements": candidate_profile.accessibility_requirements,
             "date_of_birth": candidate_profile.date_of_birth,
             "emergency_contact_name": candidate_profile.emergency_contact_name,
@@ -236,10 +238,107 @@ def getUpcomingInterviews(request):
         employer = EmployerProfile.objects.get(user__email=email, company_name=company_name)
         job_postings = JobPosting.objects.filter(employer=employer)
         applications = Application.objects.filter(job__in=job_postings)
-        interviews = Interview.objects.filter(application__in=applications).values()
+        
+        now = timezone.now()
+        today = now.date()
 
-        return Response({"interviews": list(interviews)}, status=200)
+        interviews = Interview.objects.filter(
+            application__in=applications,
+            date__gte=today
+        ).exclude(
+            date=today,
+            end_time__lt=now.time()
+        ).select_related('application__job', 'application__applicant__candidateprofile')
+
+        interview_list = []
+        for interview in interviews:
+            interview_data = {
+                'id': interview.id,
+                'application_id': interview.application.id,
+                'interview_type': interview.interview_type,
+                'date': interview.date.isoformat(),
+                'start_time': interview.start_time.isoformat(),
+                'end_time': interview.end_time.isoformat(),
+                'interview_location': interview.interview_location,
+                'meeting_link': interview.meeting_link,
+                'additional_details': interview.additional_details,
+                'status': interview.status,
+                'feedback': interview.feedback,
+                'job_title': interview.application.job.job_title,
+                'candidate_full_name': interview.application.applicant.candidateprofile.full_name,
+                'candidate_phone': interview.application.applicant.candidateprofile.contact_phone,
+                'candidate_email': interview.application.applicant.email,
+            }
+            interview_list.append(interview_data)
+
+        return Response({"interviews": interview_list}, status=200)
     except EmployerProfile.DoesNotExist:
         return Response({"error": "Employer not found"}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def updateInterview(request):
+    try:
+        data = request.data
+        print("Received data:", data)  # Debug print to check what data is received
+
+        interview_id = data.get('id')
+        if not interview_id:
+            return Response({"message": "Interview ID is required"}, status=400)
+
+        try:
+            interview = Interview.objects.get(id=interview_id)
+        except Interview.DoesNotExist:
+            return Response({"message": "Interview not found"}, status=404)
+
+        interview.interview_type = data.get('interview_type', interview.interview_type)
+        interview.date = data.get('date', interview.date)
+        interview.start_time = data.get('start_time', interview.start_time)
+        interview.end_time = data.get('end_time', interview.end_time)
+        interview.interview_location = data.get('interview_location', interview.interview_location)
+        interview.meeting_link = data.get('meeting_link', interview.meeting_link)
+        interview.additional_details = data.get('additional_details', interview.additional_details)
+        interview.status = 'Rescheduled'
+        interview.save()
+
+        # Update the application status
+        application_id = data.get('application_id')
+        if application_id:
+            try:
+                application = Application.objects.get(id=application_id)
+                application.status = 'Interview Rescheduled'
+                application.save()
+            except Application.DoesNotExist:
+                return Response({"message": "Application not found"}, status=404)
+
+        return Response({"message": "Interview updated successfully", "interview": interview.id}, status=200)
+    except Exception as e:
+        print("Error in updateInterview:", str(e))  # Debug print to check the error
+        return Response({"message": "An error occurred", "error": str(e)}, status=500)
+
+@api_view(['POST'])
+def cancelInterview(request):
+    try:
+        data = request.data
+        interview_id = data.get('id')
+        if not interview_id:
+            return Response({"message": "Interview ID is required"}, status=400)
+
+        try:
+            interview = Interview.objects.get(id=interview_id)
+        except Interview.DoesNotExist:
+            return Response({"message": "Interview not found"}, status=404)
+
+        interview.status = 'Cancelled'
+        interview.save()
+
+        # Update the application status
+        application = interview.application
+        application.status = 'Interview Cancelled'
+        application.save()
+
+        return Response({"message": "Interview cancelled successfully", "interview": interview.id}, status=200)
+    except Exception as e:
+        print("Error in cancelInterview:", str(e))
+        return Response({"message": "An error occurred", "error": str(e)}, status=500)

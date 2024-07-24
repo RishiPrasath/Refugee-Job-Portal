@@ -7,6 +7,8 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import LinkIcon from '@mui/icons-material/Link';
 import NotesIcon from '@mui/icons-material/Notes';
 import StatusIcon from '@mui/icons-material/CheckCircle';
+import WorkIcon from '@mui/icons-material/Work';
+import BusinessIcon from '@mui/icons-material/Business';
 
 const UpcomingInterviews: React.FC = () => {
   const { email, username } = useGlobalState();
@@ -38,24 +40,38 @@ const UpcomingInterviews: React.FC = () => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Box display="flex" alignItems="center" mb={1}>
+              <WorkIcon style={{ marginRight: '0.5rem' }} />
+              <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>Job Title</Typography>
+            </Box>
+            <Typography variant="body2">{interview.job_title}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" mb={1}>
+              <BusinessIcon style={{ marginRight: '0.5rem' }} />
+              <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>Company</Typography>
+            </Box>
+            <Typography variant="body2">{interview.company_name}</Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Box display="flex" alignItems="center" mb={1}>
               <EventIcon style={{ marginRight: '0.5rem' }} />
               <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>Date</Typography>
             </Box>
-            <Typography variant="body2">{interview.date}</Typography>
+            <Typography variant="body2">{new Date(interview.date).toLocaleDateString()}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" mb={1}>
               <AccessTimeIcon style={{ marginRight: '0.5rem' }} />
               <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>Start Time</Typography>
             </Box>
-            <Typography variant="body2">{interview.start_time}</Typography>
+            <Typography variant="body2">{new Date(`1970-01-01T${interview.start_time}`).toLocaleTimeString()}</Typography>
           </Grid>
           <Grid item xs={6}>
             <Box display="flex" alignItems="center" mb={1}>
               <AccessTimeIcon style={{ marginRight: '0.5rem' }} />
               <Typography variant="subtitle1" style={{ fontWeight: 'bold' }}>End Time</Typography>
             </Box>
-            <Typography variant="body2">{interview.end_time}</Typography>
+            <Typography variant="body2">{new Date(`1970-01-01T${interview.end_time}`).toLocaleTimeString()}</Typography>
           </Grid>
           {interview.interview_type === 'in-person' && (
             <Grid item xs={12}>

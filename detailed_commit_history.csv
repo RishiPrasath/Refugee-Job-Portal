@@ -1,0 +1,107 @@
+f99059123bcbee552086e020814e1422e3cd0bee;RishiPrasath;2024-07-19;feat: Add interview appointment setup and viewing;- Implement API endpoint for employers to set up interview appointments
+- Create API endpoint for candidates to view their upcoming interviews
+- Update URL routing for getCandidateUpcomingInterviews
+- Enhance candidate interface to display upcoming interviews
+
+This commit enables employers to schedule interviews and allows
+candidates to view their upcoming interview appointments, improving
+the overall job application process and user experience.
+
+954a646162706fe4dbc4e816fb9235ca3e14a897;RishiPrasath;2024-07-17;Enhance Job Posting and Application Control UX;- Added a section to view applicants in JobPosting component.
+  - Implemented ApplicationCard component to display applicant details.
+  - Integrated navigation to individual job applications.
+
+- Improved UX in JobApplicationControl component.
+  - Wrapped action buttons (Approve, Reject, Arrange Interview) in a responsive card.
+  - Ensured buttons are flexible and maintain dimensions across mobile and desktop modes.
+  - Enhanced CandidateProfileSection to display comprehensive candidate details.
+  - Added functionality to download CV in a new tab.
+
+Changes:
+- JobPosting.tsx: startLine: 0 endLine: 310
+- JobApplicationControl.tsx: startLine: 0 endLine: 304
+
+df35cddc38772891e45a155c5dfd6897184508b6;RishiPrasath;2024-07-16;feat: Add job application and withdrawal feature, viewable saved and applied jobs in candidate profile;- Implemented job application and withdrawal functionality in JobPosting component.
+- Added ability to view saved jobs and applied jobs in candidate profile.
+
+4422f0ddc539b1b4fc9d6560c9db4ff4c720b777;RishiPrasath;2024-07-15;Enhance User Registration, Job Posting, and Profile Management with New Fields and Validation;### Frontend Changes
+1. **globalState.tsx**: Updated global state management for improved data handling across components.
+2. **Login.tsx**: Refined login component with enhanced validation and error handling.
+3. **Registration.tsx**: Modularized the registration component by breaking it down into individual field components. Added dynamic field rendering based on user role and improved form validation.
+4. **CompensationAmountField.tsx**, **CompensationTypeField.tsx**, **EmploymentTermField.tsx**, **ISLField.tsx**, **JobDescriptionField.tsx**, **JobTitleField.tsx**, **JobTypeField.tsx**, **LocationField.tsx**, **RequirementsField.tsx**, **SkillsField.tsx**: Created individual field components for job posting forms with specific validation.
+5. **AccessibilityRequirementsField.tsx**, **CompanyNameField.tsx**, **ContactPhoneField.tsx**, **DateOfBirthField.tsx**, **DescriptionField.tsx**, **EmailField.tsx**, **EmergencyContactNameField.tsx**, **EmergencyContactPhoneField.tsx**, **FullNameField.tsx**, **GitHubProfileField.tsx**, **ImmigrationStatusField.tsx**, **IndustryField.tsx**, **LinkedInProfileField.tsx**, **LocationField.tsx**, **LogoUrlField.tsx**, **PasswordField.tsx**, **ProfilePictureField.tsx**, **QualificationsField.tsx**, **SkillsField.tsx**, **SummaryField.tsx**, **WebsiteUrlField.tsx**, **WorkExperienceField.tsx**: Developed individual form field components to ensure clean and maintainable code.
+6. **CustomTextareaProps.tsx**: Added custom textarea properties for reusable components.
+7. **Home.tsx**, **NavBar.tsx**: Enhanced the navigation and home components with better state management and user experience improvements.
+8. **CandidateProfile.tsx**, **JobPosting.tsx**, **searchJobPostings.tsx**, **DisplayCandidate.tsx**, **ViewCandidates.tsx**, **AddJobPostings.tsx**, **JobPosting.tsx**, **ViewJobPostings.tsx**: Implemented new views and refined existing ones to handle the new field components and data structure.
+9. **App.tsx**: Updated the main application component to integrate all new changes and ensure smooth routing and state management.
+
+### Backend Changes
+1. **models.py**: Modified models to accommodate new fields such as `immigration_status` and `profilePicture`. Adjusted existing models for better alignment with frontend changes.
+2. **urls.py**: Updated URLs to match the new views and endpoints.
+3. **views.py**: Refined views to handle the new form data, validation, and improved API responses.
+4. **admin.py**: Updated the admin configuration to manage the new fields and models effectively.
+
+### Summary
+- Modularized frontend forms for better maintainability and readability.
+- Improved backend models and views to handle new fields and ensure data consistency.
+- Enhanced user registration and job posting workflows with detailed validation and dynamic field management based on user roles.
+- Ensured seamless integration of frontend and backend changes to provide a cohesive user experience.
+
+This commit sets the foundation for a more robust and scalable application architecture, improving both developer productivity and end-user experience.
+
+97862cef892c35a5f3a6fceeadaa8d026969bbcf;RishiPrasath;2024-07-07;Implement Successful Registration and Login Functionality with Enhanced Error Handling;- **Backend Enhancements:**
+  - Updated the `login` view in `views.py` to handle separate scenarios for non-existent users and incorrect passwords.
+  - Ensured appropriate error messages are returned for these scenarios.
+
+- **Frontend Enhancements:**
+  - Updated `Login.tsx` to handle and display error messages for non-existent users and incorrect passwords.
+  - Ensured error messages are displayed below the login button.
+  - Improved the `NavBar.tsx` component to conditionally render "Login" and "Register" links when the user is not logged in, and "Home" and "Log Out" links when the user is logged in.
+  - Added a consistent logout button with a `PowerSettingsNew` icon that appears at the rightmost of the navbar in both mobile and desktop views.
+  - Ensured the logout button is not placed inside the navigation drawer on mobile.
+
+- **Global State Management:**
+  - Utilized the `useGlobalState` hook to manage and access global state variables such as `loggedIn`, `username`, `email`, and others.
+  - Implemented state updates and navigation redirection upon successful login and logout.
+
+- **Login and Registration Functionality:**
+  - Completed the implementation of login and registration functionality for both frontend and backend.
+
+24232bc399e25c23cb9101e966c541a7a73ab6bd;RishiPrasath;2024-07-02;Correction;Added missing fields
+
+-  Immigration Status for candidates
+- Profile Picture for Candidates
+
+92246977fa2cffef4c76d263100774633db63beb;RishiPrasath;2024-07-02;Refactor Registration Component with Enhanced Field Validation and Dynamic Rendering;Refactor Registration Component and Add Field Validators
+
+- Refactored `Registration.tsx` to improve code organization and readability.
+- Added state management for form data, errors, selected skills, work experiences, and qualifications.
+- Implemented handlers for updating work experiences and qualifications.
+- Added validation for emergency contact phone numbers.
+- Dynamically rendered additional fields based on user type (Candidate, Employer, Hiring Coordinator, Case Worker).
+- Utilized various field components (e.g., UsernameField, PasswordField, EmailField) for form inputs.
+- Ensured form data is filtered and structured correctly before submission.
+
+9a096df1b1c375f3d94f848f6bd8c4daea033db8;RishiPrasath;2024-06-25;Basic setup;Set up initial project structure and basic configurations
+
+- Created directories and files for user-specific views and URLs in the Django backend:
+  - `candidates/`
+  - `advisors/`
+  - `coordinators/`
+  - `employers/`
+  - `auth/`
+- Added test routes for each user type with JSON responses:
+  - `candidates/urls.py` and `candidates/views.py`
+  - `advisors/urls.py` and `advisors/views.py`
+  - `coordinators/urls.py` and `coordinators/views.py`
+  - `employers/urls.py` and `employers/views.py`
+  - `auth/urls.py` and `auth/views.py`
+- Updated main `urls.py` to include the new URL configurations:
+
+- Created basic React setup and installed necessary dependencies:
+  - `create-react-app` with TypeScript template
+  - Installed dependencies for React, React Router, Material-UI, and form handling
+- Set up basic React components and routing:
+  - `App.tsx` with routes for `Login`, `Registration`, and `Home` components
+
+00d002cbfcbc382e047a7b013acfbf4a74417a90;RishiPrasath;2024-06-20;Initial commit;

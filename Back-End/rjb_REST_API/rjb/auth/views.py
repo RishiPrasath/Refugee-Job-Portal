@@ -40,6 +40,7 @@ def login(request):
         assigned_case_worker = " "
         skills = []
         profile_picture = " "
+        company_logo = " "
         # Fetch full name based on user role
         if role == 'Candidate':
             print("User is a candidate")
@@ -55,7 +56,12 @@ def login(request):
                     profile_picture = base64.b64encode(image_file.read()).decode('utf-8')
         elif role == 'Employer':
             print("User is an employer")
-            company_name = EmployerProfile.objects.get(user=user).company_name
+            employer_profile = EmployerProfile.objects.get(user=user)
+            company_name = employer_profile.company_name
+            if employer_profile.logo:
+                with open(employer_profile.logo.path, "rb") as image_file:
+                    company_logo = base64.b64encode(image_file.read()).decode('utf-8')
+                print("Company logo base64: ", company_logo)  # Debugging line
         elif role == 'Hiring Coordinator':
             print("User is a hiring coordinator")
             full_name = HiringCoordinatorProfile.objects.get(user=user).full_name
@@ -75,17 +81,18 @@ def login(request):
             "accessibility_requirements": accessibility_requirements,
             "assigned_case_worker": assigned_case_worker,
             "skills": skills,
-            "profile_picture": profile_picture
+            "profile_picture": profile_picture,
+            "company_logo": company_logo
         }
-
-        #print("response_data: ", response_data)
 
         return JsonResponse(response_data)
     except Exception as e:
         print("Exception occurred:", str(e))
         print(traceback.format_exc())  # Print the full traceback for debugging
         return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
+    
 
+    
 @api_view(['POST'])
 def register(request):
     data = {

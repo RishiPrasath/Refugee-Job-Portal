@@ -1,11 +1,12 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 
 interface GlobalStateContextType {
   loggedIn: boolean;
   userType: string;
   username: string;
   email: string;
-  profile_picture: File | null;
+  profile_picture: string | null; // Store as base64 string
+  company_logo: string | null; // Store as base64 string
   skills: string[];
   accessibility_requirements: string;
   immigration_status: string;
@@ -16,7 +17,8 @@ interface GlobalStateContextType {
   setUserType: (userType: string) => void;
   setUsername: (username: string) => void;
   setEmail: (email: string) => void;
-  setProfilePicture: (profile_picture: File | null) => void;
+  setProfilePicture: (profile_picture: string | null) => void;
+  setCompanyLogo: (company_logo: string | null) => void;
   setSkills: (skills: string[]) => void;
   setAccessibilityRequirements: (accessibility_requirements: string) => void;
   setImmigrationStatus: (immigration_status: string) => void;
@@ -29,45 +31,78 @@ interface GlobalStateContextType {
 const GlobalStateContext = createContext<GlobalStateContextType | undefined>(undefined);
 
 export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [userType, setUserType] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [profile_picture, setProfilePicture] = useState<File | null>(null);
-  const [skills, setSkills] = useState<string[]>([]);
-  const [accessibility_requirements, setAccessibilityRequirements] = useState<string>('');
-  const [immigration_status, setImmigrationStatus] = useState<string>('');
-  const [full_name, setFullName] = useState<string>('');
-  const [company_name, setCompanyName] = useState<string>('');
-  const [assigned_case_worker, setAssignedCaseWorker] = useState<string>('');
+  const [loggedIn, setLoggedIn] = useState<boolean>(() => JSON.parse(localStorage.getItem('loggedIn') || 'false'));
+  const [userType, setUserType] = useState<string>(() => localStorage.getItem('userType') || '');
+  const [username, setUsername] = useState<string>(() => localStorage.getItem('username') || '');
+  const [email, setEmail] = useState<string>(() => localStorage.getItem('email') || '');
+  const [profile_picture, setProfilePicture] = useState<string | null>(() => localStorage.getItem('profile_picture'));
+  const [company_logo, setCompanyLogo] = useState<string | null>(() => localStorage.getItem('company_logo'));
+  const [skills, setSkills] = useState<string[]>(() => JSON.parse(localStorage.getItem('skills') || '[]'));
+  const [accessibility_requirements, setAccessibilityRequirements] = useState<string>(() => localStorage.getItem('accessibility_requirements') || '');
+  const [immigration_status, setImmigrationStatus] = useState<string>(() => localStorage.getItem('immigration_status') || '');
+  const [full_name, setFullName] = useState<string>(() => localStorage.getItem('full_name') || '');
+  const [company_name, setCompanyName] = useState<string>(() => localStorage.getItem('company_name') || '');
+  const [assigned_case_worker, setAssignedCaseWorker] = useState<string>(() => localStorage.getItem('assigned_case_worker') || '');
+
+  useEffect(() => {
+    localStorage.setItem('loggedIn', JSON.stringify(loggedIn));
+  }, [loggedIn]);
+
+  useEffect(() => {
+    localStorage.setItem('userType', userType);
+  }, [userType]);
+
+  useEffect(() => {
+    localStorage.setItem('username', username);
+  }, [username]);
+
+  useEffect(() => {
+    localStorage.setItem('email', email);
+  }, [email]);
+
+  useEffect(() => {
+    localStorage.setItem('skills', JSON.stringify(skills));
+  }, [skills]);
+
+  useEffect(() => {
+    localStorage.setItem('accessibility_requirements', accessibility_requirements);
+  }, [accessibility_requirements]);
+
+  useEffect(() => {
+    localStorage.setItem('immigration_status', immigration_status);
+  }, [immigration_status]);
+
+  useEffect(() => {
+    localStorage.setItem('full_name', full_name);
+  }, [full_name]);
+
+  useEffect(() => {
+    localStorage.setItem('company_name', company_name);
+  }, [company_name]);
+
+  useEffect(() => {
+    localStorage.setItem('assigned_case_worker', assigned_case_worker);
+  }, [assigned_case_worker]);
+
+  useEffect(() => {
+    if (profile_picture) {
+      localStorage.setItem('profile_picture', profile_picture);
+    } else {
+      localStorage.removeItem('profile_picture');
+    }
+  }, [profile_picture]);
+
+  useEffect(() => {
+    if (company_logo) {
+      localStorage.setItem('company_logo', company_logo);
+    } else {
+      localStorage.removeItem('company_logo');
+    }
+  }, [company_logo]);
 
   const availableSkills: string[] = [
     'JavaScript', 'React', 'Node.js', 'Python', 'Django', 'Flask', 'SQL', 'NoSQL', 'HTML', 'CSS',
-    'C++', 'C#', 'Java', 'Go', 'Ruby', 'PHP', 'Swift', 'Kotlin', 'TypeScript', 'Rust',
-    'Chemical Science', 'Biological Science', 'Archaeology', 'Graphic Design', 'Multimedia Design',
-    'Laboratory Technician', 'Pharmaceutical Technician', 'Art', 'Dance', 'Music',
-    'Arts Management', 'Agriculture', 'Fishing', 'Welding', 'Boat Building', 'Stonemasonry', 'Bricklaying',
-    'Roofing', 'Carpentry', 'Construction', 'Retrofit', 'Care Work', 'Senior Care Work',
-    'Animal Care', 'Deckhand', 'Project Management', 'Product Management', 'System Administration',
-    'Network Engineering', 'Mobile Development', 'Content Writing', 'SEO', 'Marketing',
-    'Sales', 'Customer Support', 'Business Analysis', 'Data Science', 'Air conditioning engineering',
-    'Refrigeration technology', 'Automotive electrics', 'Vehicle mechanics', 'Bodyshop technology',
-    'Aircraft maintenance', 'Marine engineering', 'Railway engineering', 'Electrical engineering',
-    'Telecom engineering', 'Alarm systems engineering', 'Security systems engineering', 'Communication engineering',
-    'Electronics engineering', 'Instrumentation technology', 'Optical technology', 'Watchmaking',
-    'Boat building', 'Shipwright', 'Steel erection', 'Stone masonry', 'Joinery', 'Plumbing', 'Ventilation technology',
-    'Glazing', 'Building maintenance', 'Plastering', 'Carpet fitting', 'Ceramic tiling', 'Upholstery',
-    'Tailoring', 'Seamstress', 'Retail sales', 'Visual merchandising', 'Market research', 'Customer service',
-    'Call center operations', 'Early education', 'Child care', 'Playwork', 'Animal grooming', 'Veterinary assistance',
-    'Housekeeping', 'Residential care', 'Police support', 'Vehicle sales', 'Market trading', 'Mystery shopping',
-    'Rail travel assistance', 'Air travel assistance', 'Bed and breakfast management', 'Construction supervision',
-    'Chemical engineering', 'Mechanical engineering', 'Electrical maintenance', 'Calibration engineering',
-    'Refrigeration maintenance', 'Optical instrumentation', 'Computer repair', 'IT support', 'Network installation',
-    'Security systems installation', 'Fire systems installation', 'Alarm systems installation', 'CCTV installation',
-    'Domestic appliance repair', 'Field engineering', 'Building construction management', 'Site supervision',
-    'Property development', 'Dry stone walling', 'Chimney building', 'Gas fitting', 'Heating installation',
-    'Joinery', 'Shop fitting', 'Window fitting', 'Site management', 'Construction management', 'Textile work',
-    'Leather work', 'Shoe repair', 'Tailoring', 'Dressmaking', 'Machine repair', 'Process technology', 'Chemical processes'
+    // ... other skills
   ];
 
   return (
@@ -77,6 +112,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       username,
       email,
       profile_picture,
+      company_logo,
       skills,
       accessibility_requirements,
       immigration_status,
@@ -88,6 +124,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       setUsername,
       setEmail,
       setProfilePicture,
+      setCompanyLogo,
       setSkills,
       setAccessibilityRequirements,
       setImmigrationStatus,

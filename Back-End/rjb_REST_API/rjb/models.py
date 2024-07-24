@@ -30,14 +30,21 @@ class Qualification(models.Model):
     end_year = models.IntegerField()
     candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
 
-# New WorkExperience model
+
 class WorkExperience(models.Model):
+    # Name of the company where the experience was gained
     company = models.CharField(max_length=255)
+    # Job title or role held during the experience
     role = models.CharField(max_length=255)
+    # Year when the work experience started
     start_year = models.IntegerField()
+    # Year when the work experience ended
     end_year = models.IntegerField()
+    # Detailed description of the work experience (optional)
     description = models.TextField(null=True, blank=True)
+    # Skills associated with this work experience (optional)
     skills = models.ManyToManyField('Skill', blank=True)
+    # Foreign key to link this experience to a specific candidate profile
     candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
 
 def candidate_profile_picture_directory_path(instance, filename):

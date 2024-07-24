@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, addJobPosting, getJobPostings, getJobDetails, getCandidateApplicationDetails, createInterview, getUpcomingInterviews
+from .views import home, addJobPosting, getJobPostings, getJobDetails, getCandidateApplicationDetails, createInterview, getUpcomingInterviews, updateInterview, cancelInterview
 
 urlpatterns = [
     path('', home, name='employer-home'),
@@ -9,4 +9,6 @@ urlpatterns = [
     path('getCandidateApplicationDetails/<int:application_id>/', getCandidateApplicationDetails, name='getCandidateApplicationDetails'),
     path('createInterview/', createInterview, name='createInterview'),
     path('getUpcomingInterviews/', getUpcomingInterviews, name='getUpcomingInterviews'),
+    path('updateInterview/', updateInterview, name='updateInterview'),
+    path('cancelInterview/', cancelInterview, name='cancelInterview'),  # New route
 ]

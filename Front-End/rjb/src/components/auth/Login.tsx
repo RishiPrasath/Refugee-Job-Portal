@@ -17,6 +17,7 @@ const Login: React.FC = () => {
     setUserType, 
     setFullName, 
     setProfilePicture, 
+    setCompanyLogo, // Added this line
     setSkills, 
     setAccessibilityRequirements, 
     setImmigrationStatus, 
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
     username, 
     email: globalEmail, 
     profile_picture, 
+    company_logo, // Added this line
     skills, 
     accessibility_requirements, 
     immigration_status, 
@@ -66,6 +68,7 @@ const Login: React.FC = () => {
         setUserType(data.role);
         setFullName(data.full_name);
         setProfilePicture(data.profile_picture);
+        setCompanyLogo(data.company_logo); // Added this line
         setSkills(data.skills);
         setAccessibilityRequirements(data.accessibility_requirements);
         setImmigrationStatus(data.immigration_status);
@@ -79,6 +82,7 @@ const Login: React.FC = () => {
           username,
           globalEmail,
           profile_picture,
+          company_logo, // Added this line
           skills,
           accessibility_requirements,
           immigration_status,

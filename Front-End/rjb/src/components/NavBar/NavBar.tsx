@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, Box, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, IconButton, Drawer, List, ListItem, ListItemText, Box, useMediaQuery, Avatar } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import calendar icon
 import { useTheme } from '@mui/material/styles';
 import { useGlobalState } from '../../globalState/globalState';
 
@@ -15,7 +16,7 @@ const NavBar: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isMediumScreen = useMediaQuery(theme.breakpoints.between('sm', 'md'));
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
-  const { loggedIn, userType, setLoggedIn } = useGlobalState();
+  const { loggedIn, userType, setLoggedIn, profile_picture, company_logo } = useGlobalState();
   const navigate = useNavigate();
 
   const toggleDrawer = (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -64,7 +65,7 @@ const NavBar: React.FC = () => {
                 <ListItemText primary="View Job Postings" />
               </ListItem>
               <ListItem button component={Link} to="/upcoming-interviews">
-                <WorkIcon style={{ marginRight: '0.5rem' }} />
+                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} /> {/* Updated icon */}
                 <ListItemText primary="Upcoming Interviews" />
               </ListItem>
             </>
@@ -82,7 +83,7 @@ const NavBar: React.FC = () => {
                 <ListItemText primary="Search Job Postings" />
               </ListItem>
               <ListItem button component={Link} to="/candidate-upcoming-interviews">
-                <WorkIcon style={{ marginRight: '0.5rem' }} />
+                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} /> {/* Updated icon */}
                 <ListItemText primary="Upcoming Interviews" />
               </ListItem>
               <ListItem button component={Link} to="/profile">
@@ -117,6 +118,24 @@ const NavBar: React.FC = () => {
                   onClick={toggleDrawer(false)}
                   onKeyDown={toggleDrawer(false)}
                 >
+                  {loggedIn && (
+                    <Box display="flex" justifyContent="center" mb={2}>
+                      {userType === 'Employer' && company_logo && (
+                        <Avatar
+                          src={`data:image/jpeg;base64,${company_logo}`}
+                          alt="Company Logo"
+                          style={{ width: '80px', height: '80px' }}
+                        />
+                      )}
+                      {userType === 'Candidate' && profile_picture && (
+                        <Avatar
+                          src={`data:image/jpeg;base64,${profile_picture}`}
+                          alt="Profile Picture"
+                          style={{ width: '80px', height: '80px' }}
+                        />
+                      )}
+                    </Box>
+                  )}
                   {renderNavItems}
                 </Box>
               </Drawer>
@@ -148,7 +167,7 @@ const NavBar: React.FC = () => {
                         View Job Postings
                       </Button>
                       <Button color="inherit" component={Link} to="/upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
-                        <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} /> {/* Updated icon */}
                         Upcoming Interviews
                       </Button>
                     </>
@@ -166,7 +185,7 @@ const NavBar: React.FC = () => {
                         Search Job Postings
                       </Button>
                       <Button color="inherit" component={Link} to="/candidate-upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
-                        <WorkIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} /> {/* Updated icon */}
                         Upcoming Interviews
                       </Button>
                       <Button color="inherit" component={Link} to="/profile" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
@@ -179,6 +198,20 @@ const NavBar: React.FC = () => {
                     Log Out
                     <PowerSettingsNewIcon style={{ marginLeft: '0.4rem', fontSize: '0.8rem' }} />
                   </Button>
+                  {userType === 'Employer' && company_logo && (
+                    <Avatar
+                      src={`data:image/jpeg;base64,${company_logo}`}
+                      alt="Company Logo"
+                      style={{ marginLeft: '1rem', width: '40px', height: '40px' }}
+                    />
+                  )}
+                  {userType === 'Candidate' && profile_picture && (
+                    <Avatar
+                      src={`data:image/jpeg;base64,${profile_picture}`}
+                      alt="Profile Picture"
+                      style={{ marginLeft: '1rem', width: '40px', height: '40px' }}
+                    />
+                  )}
                 </>
               )}
             </>

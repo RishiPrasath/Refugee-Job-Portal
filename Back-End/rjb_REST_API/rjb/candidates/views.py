@@ -7,6 +7,8 @@ from rjb.models import *
 import base64
 import os
 from django.conf import settings
+from django.utils import timezone
+from datetime import datetime, time
 
 @api_view(['GET'])
 def home(request):
@@ -340,24 +342,40 @@ def getCandidateUpcomingInterviews(request):
     print("username: ", username)
     print("===============================")
 
-
     try:
         user = User.objects.get(username=username, email=email)
         candidate_profile = CandidateProfile.objects.get(user=user)
         applications = Application.objects.filter(applicant=user)
-        interviews = Interview.objects.filter(application__in=applications)
+
+        # Get current date and time
+        now = timezone.now()
+        today = now.date()
+
+        # Filter interviews
+        interviews = Interview.objects.filter(
+            application__in=applications
+        ).filter(
+            # Interview date is today or in the future
+            date__gte=today
+        ).exclude(
+            # Exclude interviews from today that have already ended
+            date=today,
+            end_time__lt=now.time()
+        ).select_related('application__job__employer')  # Optimize query
 
         interview_data = [
             {
                 'id': interview.id,
                 'interview_type': interview.interview_type,
-                'date': interview.date,
-                'start_time': interview.start_time,
-                'end_time': interview.end_time,
+                'date': interview.date.isoformat(),
+                'start_time': interview.start_time.isoformat(),
+                'end_time': interview.end_time.isoformat(),
                 'interview_location': interview.interview_location,
                 'meeting_link': interview.meeting_link,
                 'additional_details': interview.additional_details,
                 'status': interview.status,
+                'job_title': interview.application.job.job_title,
+                'company_name': interview.application.job.employer.company_name,
             }
             for interview in interviews
         ]
