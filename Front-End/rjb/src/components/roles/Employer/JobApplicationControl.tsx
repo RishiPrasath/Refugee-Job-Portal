@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Box, Grid, Avatar, Chip, Card, CardContent, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
+import { Typography, Box, Grid, Avatar, Chip, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -19,6 +19,11 @@ import SaveIcon from '@mui/icons-material/Save';
 import DescriptionIcon from '@mui/icons-material/Description';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import EventIcon from '@mui/icons-material/Event';
+import CandidateProfileSection from './JobApplicationControl/CandidateProfileSection';
+import ApplicationCard from './JobApplicationControl/ApplicationCard';
+import ActionButtons from './JobApplicationControl/ActionButtons';
+import InterviewCard from './JobApplicationControl/InterviewCard';
+import { useGlobalState } from '../../../globalState/globalState';
 
 interface CandidateProfile {
   full_name: string;
@@ -38,6 +43,7 @@ interface CandidateProfile {
   profile_picture: string | null;
   status: string;
   application: Application;
+  company_name: string;
 }
 
 interface Qualification {
@@ -67,218 +73,41 @@ interface Application {
   created_at: string;
 }
 
-const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ profile }) => (
-  <Accordion>
-    <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-      <Typography variant="h5">Candidate Profile</Typography>
-    </AccordionSummary>
-    <AccordionDetails>
-      <Card elevation={3} sx={{ borderRadius: '8px' }}>
-        <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={4} display="flex" justifyContent="center" alignItems="center">
-              <Avatar
-                alt={profile.full_name}
-                src={`data:image/jpeg;base64,${profile.profile_picture}`}
-                sx={{ width: 150, height: 150, marginBottom: 2 }}
-              />
-            </Grid>
-            <Grid item xs={12} sm={8}>
-              <Typography variant="h5" mb={2}>{profile.full_name}</Typography>
-              <Box display="flex" alignItems="center" mb={2}>
-                <EmailIcon />
-                <Typography variant="body1" ml={1}>{profile.email}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <PhoneIcon />
-                <Typography variant="body1" ml={1}>{profile.contact_phone}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <CakeIcon />
-                <Typography variant="body1" ml={1}>{profile.date_of_birth}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <ContactEmergencyIcon />
-                <Typography variant="body1" ml={1}>{profile.emergency_contact_name} ({profile.emergency_contact_phone})</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <LinkedInIcon />
-                <Typography variant="body1" ml={1}>{profile.linkedin_profile}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <GitHubIcon />
-                <Typography variant="body1" ml={1}>{profile.github_profile}</Typography>
-              </Box>
-              <Box display="flex" alignItems="center" mb={2}>
-                <InfoIcon />
-                <Typography variant="body1" ml={1}>{profile.summary}</Typography>
-              </Box>
-            </Grid>
-          </Grid>
-          <Box mt={3}>
-            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <SkillIcon style={{ marginRight: '8px' }} /> Skills
-            </Typography>
-            <Box display="flex" flexWrap="wrap" gap={1}>
-              {profile.skills.map((skill, index) => (
-                <Chip key={index} label={skill} style={{ backgroundColor: 'green', color: 'white' }} />
-              ))}
-            </Box>
-          </Box>
-          <Box mt={3}>
-            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <SchoolIcon style={{ marginRight: '8px' }} /> Qualifications
-            </Typography>
-            {profile.qualifications.map(qualification => (
-              <Box key={qualification.id} mb={2} p={2} sx={{ backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
-                <Typography variant="body2">
-                  <strong>{qualification.school}</strong>, {qualification.qualification} ({qualification.start_year} - {qualification.end_year})
-                </Typography>
-              </Box>
-            ))}
-          </Box>
-          <Box mt={3}>
-            <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
-              <WorkIcon style={{ marginRight: '8px' }} /> Work Experiences
-            </Typography>
-            {profile.workExperiences.map(experience => (
-              <Box key={experience.id} mb={2} p={2} sx={{ backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
-                <Box display="flex" mb={1}>
-                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Company:</strong></Typography>
-                  <Typography variant="body2">{experience.company}</Typography>
-                </Box>
-                <Box display="flex" mb={1}>
-                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Role:</strong></Typography>
-                  <Typography variant="body2">{experience.role}</Typography>
-                </Box>
-                <Box display="flex" mb={1}>
-                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Years:</strong></Typography>
-                  <Typography variant="body2">{experience.start_year} - {experience.end_year}</Typography>
-                </Box>
-                <Box display="flex" mb={1}>
-                  <Typography variant="body2" style={{ minWidth: '100px' }}><strong>Description:</strong></Typography>
-                  <Typography variant="body2">{experience.description}</Typography>
-                </Box>
-              </Box>
-            ))}
-          </Box>
-        </CardContent>
-      </Card>
-    </AccordionDetails>
-  </Accordion>
-);
-
-const ApplicationCard: React.FC<{ application: Application }> = ({ application }) => {
-  const openInNewTab = () => {
-    if (application.cv_url) {
-      window.open(application.cv_url, '_blank');
-    }
-  };
-
-  return (
-    <Card>
-      <CardContent>
-        <Box display="flex" flexDirection="column" gap={1}>
-          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center' }}>
-            <DescriptionIcon style={{ marginRight: '8px' }} /> Cover Letter
-          </Typography>
-          <Typography variant="body2">{application.cover_letter}</Typography>
-          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
-            <AssignmentTurnedInIcon style={{ marginRight: '8px' }} /> Status
-          </Typography>
-          <Typography variant="body2">{application.status}</Typography>
-          <Typography variant="h6" style={{ fontWeight: 'bold', display: 'flex', alignItems: 'center', marginTop: '16px' }}>
-            <EventIcon style={{ marginRight: '8px' }} /> Application Date
-          </Typography>
-          <Typography variant="body2">{new Date(application.created_at).toLocaleString()}</Typography>
-          {application.cv_url && (
-            <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SaveIcon />}
-                onClick={openInNewTab}
-                fullWidth
-              >
-                Download CV
-              </Button>
-            </Box>
-          )}
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-const ActionButtons: React.FC<{ applicationId: string }> = ({ applicationId }) => {
-  const navigate = useNavigate();
-
-  const handleInterviewClick = () => {
-    navigate(`/create-interview/${applicationId}`);
-  };
-
-  return (
-    <Card>
-      <CardContent>
-        <Box mt={3}>
-          <Grid container spacing={1}>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                color="success"
-                startIcon={<CheckIcon />}
-                fullWidth
-                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
-              >
-                Approve
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<CloseIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
-                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
-              >
-                Reject
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<CalendarTodayIcon sx={{ fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' } }} />}
-                sx={{ borderRadius: '20px', width: { xs: '95%', sm: '90%', md: '80%' }, fontSize: { xs: '0.75rem', sm: '1rem', md: '1.25rem' }, marginBottom: '10px' }}
-                onClick={handleInterviewClick}
-              >
-                Interview
-              </Button>
-            </Grid>
-          </Grid>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
+interface Interview {
+  id: number;
+  interview_type: string;
+  date: string;
+  start_time: string;
+  end_time: string;
+  interview_location: string;
+  meeting_link: string;
+  additional_details: string;
+  status: string;
+  feedback: string;
+  job_title: string;
+  candidate_full_name: string;
+  candidate_phone: string;
+  candidate_email: string;
+}
 
 const JobApplicationControl: React.FC = () => {
   const { applicationId } = useParams<{ applicationId: string }>();
+  const navigate = useNavigate();
+  const globalState = useGlobalState();
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
+  const [profileFetched, setProfileFetched] = useState(false);
+  const [upcomingInterviews, setUpcomingInterviews] = useState<Interview[]>([]);
+  const [closedInterviews, setClosedInterviews] = useState<Interview[]>([]);
+  const [interviewsFetched, setInterviewsFetched] = useState(false);
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!applicationId) {
-        return;
-      }
-
-      console.log(`Fetching profile for applicationId: ${applicationId}`);
-
       try {
         const response = await fetch(`http://localhost:8000/employers/getCandidateApplicationDetails/${applicationId}/`);
         const data = await response.json();
         if (response.ok) {
-          console.log("Profile data received: ", data);
           setProfile(data);
+          setProfileFetched(true); // Set profile fetched to true
         } else {
           console.error('Error fetching profile:', data.error);
         }
@@ -288,7 +117,37 @@ const JobApplicationControl: React.FC = () => {
     };
 
     fetchProfile();
-  }, [applicationId]);
+  }, [applicationId, globalState]);
+
+  useEffect(() => {
+    const fetchInterviews = async (status: string) => {
+      if (!applicationId) return;
+      try {
+        const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus/?application_id=${applicationId}&status=${status}`);
+        const data = await response.json();
+        if (response.ok) {
+
+          console.log("Interviews:", data.interviews);
+
+          if (status === 'Scheduled' || status === 'Rescheduled') setUpcomingInterviews(data.interviews);
+          else if (status === 'Cancelled' || status === 'Closed') setClosedInterviews(data.interviews);
+        } else {
+          console.error('Error fetching interviews:', data.error);
+        }
+      } catch (error) {
+        console.error('Error fetching interviews:', error);
+      } finally {
+        setInterviewsFetched(true);
+      }
+    };
+
+    if (profileFetched) { // Only fetch interviews if profile is fetched
+      fetchInterviews('Scheduled');
+      fetchInterviews('Rescheduled');
+      fetchInterviews('Cancelled');
+      fetchInterviews('Closed');
+    }
+  }, [applicationId, profileFetched]);
 
   return (
     <Box p={3}>
@@ -304,10 +163,56 @@ const JobApplicationControl: React.FC = () => {
           <Box mt={3}>
             <ActionButtons applicationId={applicationId || ''} />
           </Box>
+          {interviewsFetched && (
+            <Box mt={3}>
+              {upcomingInterviews.length > 0 && (
+                <Accordion sx={{
+                  mb: 4,
+                  boxShadow: 'none',
+                  '&:before': {
+                    display: 'none',
+                  },
+                  backgroundColor: '#ffffff', // Changed to white
+                }}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '8px 8px 0 0',
+                  }}>
+                    <Typography variant="h5">Scheduled/Rescheduled Interviews</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {upcomingInterviews.map(interview => (
+                      <InterviewCard key={interview.id} interview={interview} />
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              )}
+              {closedInterviews.length > 0 && (
+                <Accordion sx={{
+                  mb: 4,
+                  boxShadow: 'none',
+                  '&:before': {
+                    display: 'none',
+                  },
+                  backgroundColor: '#ffffff', // Changed to white
+                }}>
+                  <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{
+                    backgroundColor: '#e0e0e0',
+                    borderRadius: '8px 8px 0 0',
+                  }}>
+                    <Typography variant="h5">Cancelled/Closed Interviews</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    {closedInterviews.map(interview => (
+                      <InterviewCard key={interview.id} interview={interview} />
+                    ))}
+                  </AccordionDetails>
+                </Accordion>
+              )}
+            </Box>
+          )}
         </Box>
-      ) : (
-        <Typography>Loading...</Typography>
-      )}
+      ) : <Typography>Loading...</Typography>}
     </Box>
   );
 };

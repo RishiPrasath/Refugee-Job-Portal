@@ -244,3 +244,29 @@ class CandidateSavesJobPosting(models.Model):
 
     class Meta:
         unique_together = ('candidate', 'job_posting')
+
+# New JobOffer model
+import os
+
+def job_offer_document_directory_path(instance, filename):
+    # file will be uploaded to MEDIA_ROOT/fileUploads/Job_Offers/<job_offer_id>/<filename>
+    return os.path.join('fileUploads', 'Job_Offers', str(instance.id), filename)
+
+class JobOffer(models.Model):
+    # Foreign key linking to the JobPosting model
+    job_posting = models.ForeignKey(JobPosting, on_delete=models.CASCADE)
+    # Foreign key linking to the EmployerProfile model
+    employer = models.ForeignKey(EmployerProfile, on_delete=models.CASCADE)
+    # Foreign key linking to the CandidateProfile model
+    candidate = models.ForeignKey(CandidateProfile, on_delete=models.CASCADE)
+    # Document for the job offer
+    job_offer_document = models.FileField(upload_to=job_offer_document_directory_path, null=True, blank=True)
+    # Additional details for the job offer
+    additional_details = models.TextField(null=True, blank=True)
+    # Timestamp of when the job offer was made
+    offer_datetime = models.DateTimeField(auto_now_add=True)
+    # Status of the job offer (e.g., pending, accepted, declined)
+    status = models.CharField(max_length=50, default='pending')
+
+    def __str__(self):
+        return f"Job Offer for {self.job_posting.job_title} by {self.employer.company_name} to {self.candidate.full_name}"

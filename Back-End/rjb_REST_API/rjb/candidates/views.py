@@ -9,6 +9,7 @@ import os
 from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, time
+from django.core.files.base import ContentFile
 
 @api_view(['GET'])
 def home(request):
@@ -353,7 +354,8 @@ def getCandidateUpcomingInterviews(request):
 
         # Filter interviews
         interviews = Interview.objects.filter(
-            application__in=applications
+            application__in=applications,
+            status__in=['Scheduled', 'Rescheduled', 'Cancelled']  # Filter by status
         ).filter(
             # Interview date is today or in the future
             date__gte=today
@@ -363,8 +365,18 @@ def getCandidateUpcomingInterviews(request):
             end_time__lt=now.time()
         ).select_related('application__job__employer')  # Optimize query
 
-        interview_data = [
-            {
+        interview_data = []
+        for interview in interviews:
+            employer = interview.application.job.employer
+            company_name = employer.company_name
+            company_email = employer.user.email
+            company_logo = None
+
+            if employer.logo:
+                with open(employer.logo.path, "rb") as logo_file:
+                    company_logo = base64.b64encode(logo_file.read()).decode('utf-8')
+
+            interview_data.append({
                 'id': interview.id,
                 'interview_type': interview.interview_type,
                 'date': interview.date.isoformat(),
@@ -375,10 +387,10 @@ def getCandidateUpcomingInterviews(request):
                 'additional_details': interview.additional_details,
                 'status': interview.status,
                 'job_title': interview.application.job.job_title,
-                'company_name': interview.application.job.employer.company_name,
-            }
-            for interview in interviews
-        ]
+                'company_name': company_name,
+                'company_email': company_email,
+                'company_logo': company_logo,
+            })
 
         return JsonResponse(interview_data, safe=False)
     except User.DoesNotExist:

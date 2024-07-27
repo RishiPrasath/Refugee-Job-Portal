@@ -164,7 +164,7 @@ def getCandidateApplicationDetails(request, application_id):
             "phone_number": candidate_profile.contact_phone,
             "profile_picture": profile_picture,
             "status": application.status,
-            "immigration_status": candidate_profile.imigration_status,
+            "immigration_status": candidate_profile.immigration_status,
             "accessibility_requirements": candidate_profile.accessibility_requirements,
             "date_of_birth": candidate_profile.date_of_birth,
             "emergency_contact_name": candidate_profile.emergency_contact_name,
@@ -220,7 +220,7 @@ def createInterview(request):
             interview_location=data.get('interviewLocation'),
             meeting_link=data.get('meetingLink'),
             additional_details=data.get('additionalDetails'),
-            status=data.get('status')
+            status='Scheduled'
         )
         interview.save()
 
@@ -230,51 +230,27 @@ def createInterview(request):
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
 @api_view(['GET'])
-def getUpcomingInterviews(request):
-    email = request.query_params.get('email')
-    company_name = request.query_params.get('company_name')
+def getInterviewsByStatus(request):
+    application_id = request.query_params.get('application_id')
+    status = request.query_params.get('status')
+
+    print("Application ID:", application_id)
+    print("Status:", status)
+
+    if not application_id or not status:
+        return Response({"error": "Application ID and status are required parameters."}, status=400)
 
     try:
-        employer = EmployerProfile.objects.get(user__email=email, company_name=company_name)
-        job_postings = JobPosting.objects.filter(employer=employer)
-        applications = Application.objects.filter(job__in=job_postings)
-        
-        now = timezone.now()
-        today = now.date()
-
         interviews = Interview.objects.filter(
-            application__in=applications,
-            date__gte=today
-        ).exclude(
-            date=today,
-            end_time__lt=now.time()
-        ).select_related('application__job', 'application__applicant__candidateprofile')
+            application__id=application_id,
+            status=status
+        ).values()
 
-        interview_list = []
-        for interview in interviews:
-            interview_data = {
-                'id': interview.id,
-                'application_id': interview.application.id,
-                'interview_type': interview.interview_type,
-                'date': interview.date.isoformat(),
-                'start_time': interview.start_time.isoformat(),
-                'end_time': interview.end_time.isoformat(),
-                'interview_location': interview.interview_location,
-                'meeting_link': interview.meeting_link,
-                'additional_details': interview.additional_details,
-                'status': interview.status,
-                'feedback': interview.feedback,
-                'job_title': interview.application.job.job_title,
-                'candidate_full_name': interview.application.applicant.candidateprofile.full_name,
-                'candidate_phone': interview.application.applicant.candidateprofile.contact_phone,
-                'candidate_email': interview.application.applicant.email,
-            }
-            interview_list.append(interview_data)
+        print("Interviews:", list(interviews))
 
-        return Response({"interviews": interview_list}, status=200)
-    except EmployerProfile.DoesNotExist:
-        return Response({"error": "Employer not found"}, status=404)
+        return Response({"interviews": list(interviews)}, status=200)
     except Exception as e:
+        print("Error in getInterviewsByStatus:", str(e))
         return Response({"error": str(e)}, status=500)
 
 @api_view(['POST'])
@@ -342,3 +318,102 @@ def cancelInterview(request):
     except Exception as e:
         print("Error in cancelInterview:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
+
+@api_view(['POST'])
+def closeInterview(request):
+    try:
+        data = request.data
+        interview_id = data.get('id')
+        feedback = data.get('feedback')
+        if not interview_id:
+            return Response({"message": "Interview ID is required"}, status=400)
+        if not feedback:
+            return Response({"message": "Feedback is required"}, status=400)
+
+        try:
+            interview = Interview.objects.get(id=interview_id)
+        except Interview.DoesNotExist:
+            return Response({"message": "Interview not found"}, status=404)
+
+        interview.status = 'Closed'
+        interview.feedback = feedback
+        interview.save()
+
+        # Update the application status
+        application = interview.application
+        application.status = 'Interview Closed'
+        application.save()
+
+        return Response({"message": "Interview closed successfully", "interview": interview.id}, status=200)
+    except Exception as e:
+        print("Error in closeInterview:", str(e))
+        return Response({"message": "An error occurred", "error": str(e)}, status=500)
+    
+
+
+@api_view(['GET'])
+def getUpcomingInterviews(request):
+    company_name = request.query_params.get('company_name')
+
+    print("Company name:", company_name)
+
+    if not company_name:
+        return Response({"error": "Company name is required"}, status=400)
+
+    try:
+        # Get the employer profile
+        employer = EmployerProfile.objects.get(company_name=company_name)
+
+        print("Employer:", employer)
+
+        # Get job postings related to the employer
+        job_postings = JobPosting.objects.filter(employer=employer)
+
+        print("Job postings:", job_postings)
+
+        # Get applications related to the job postings
+        applications = Application.objects.filter(job__in=job_postings)
+
+        print("Applications:", applications)
+
+        # Get interviews related to the applications
+        interviews = Interview.objects.filter(application__in=applications, status__in=['Scheduled', 'Rescheduled','Cancelled']).select_related('application__applicant__candidateprofile')
+
+        interview_list = []
+        for interview in interviews:
+            candidate_profile = interview.application.applicant.candidateprofile
+            interview_data = {
+                "id": interview.id,
+                "interview_type": interview.interview_type,
+                "date": interview.date,
+                "start_time": interview.start_time,
+                "end_time": interview.end_time,
+                "interview_location": interview.interview_location,
+                "meeting_link": interview.meeting_link,
+                "additional_details": interview.additional_details,
+                "status": interview.status,
+                "feedback": interview.feedback,
+                "job_title": interview.application.job.job_title,
+                "candidate_full_name": candidate_profile.full_name,
+                "candidate_phone": candidate_profile.contact_phone,
+                "candidate_email": candidate_profile.user.email,
+            }
+            
+            # Add candidate profile picture base64
+            if candidate_profile.profile_picture:
+                with open(candidate_profile.profile_picture.path, "rb") as image_file:
+                    encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
+                interview_data["candidate_profile_pic"] = f"data:image/png;base64,{encoded_image}"
+            else:
+                interview_data["candidate_profile_pic"] = None
+            
+            interview_list.append(interview_data)
+
+        print("Interviews:", interview_list)
+
+        return Response({"interviews": interview_list}, status=200)
+    except EmployerProfile.DoesNotExist:
+        return Response({"error": "Employer not found"}, status=404)
+    except Exception as e:
+        print("Error in getUpcomingInterviews:", str(e))
+        return Response({"error": str(e)}, status=500)
