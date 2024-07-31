@@ -10,6 +10,8 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import datetime, time
 from django.core.files.base import ContentFile
+from rest_framework.parsers import MultiPartParser, FormParser
+from django.shortcuts import get_object_or_404
 
 @api_view(['GET'])
 def home(request):
@@ -77,9 +79,8 @@ def viewJobDetails(request, company, job_id):
         return JsonResponse({'error': 'Employer not found'}, status=404)
     except JobPosting.DoesNotExist:
         return JsonResponse({'error': 'Job not found'}, status=404)
-    
 
-
+@api_view(['GET'])
 def getCandidateProfile(request):
     email = request.GET.get('email')
     username = request.GET.get('username')
@@ -126,7 +127,6 @@ def getCandidateProfile(request):
         return JsonResponse({'error': 'User not found'}, status=404)
     except CandidateProfile.DoesNotExist:
         return JsonResponse({'error': 'Candidate profile not found'}, status=404)
-
 
 @api_view(['POST'])
 def saveJob(request):
@@ -397,3 +397,116 @@ def getCandidateUpcomingInterviews(request):
         return JsonResponse({'error': 'User not found'}, status=404)
     except CandidateProfile.DoesNotExist:
         return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+
+
+@api_view(['GET'])
+def getCandidateJobOffers(request):
+    username = request.GET.get('username')
+    email = request.GET.get('email')
+
+    print("===============================")
+    print("username: ", username)
+    print("email: ", email)
+    print("===============================")
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate = CandidateProfile.objects.get(user=user)
+        job_offers = JobOffer.objects.filter(candidate=candidate)
+
+        job_offer_data = []
+        for job_offer in job_offers:
+            job_posting = job_offer.job_posting
+            employer = job_posting.employer
+            job_offer_info = {
+                'id': job_offer.id,
+                'job_title': job_posting.job_title,
+                'company_name': employer.company_name,
+                'location': job_posting.location,
+                'employment_term': job_posting.employment_term,
+                'compensation_amount': job_posting.compensation_amount,
+                'compensation_type': job_posting.compensation_type,
+                'company_logo': request.build_absolute_uri(employer.logo.url) if employer.logo else None,
+                'offer_datetime': job_offer.offer_datetime.isoformat(),
+                'additional_details': job_offer.additional_details,
+                'job_offer_document': request.build_absolute_uri(job_offer.job_offer_document.url) if job_offer.job_offer_document else None,
+                'status': job_offer.status
+            }
+            job_offer_data.append(job_offer_info)
+
+        return JsonResponse(job_offer_data, safe=False)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@api_view(['POST'])
+def approveJobOffer(request, job_offer_id):
+    try:
+        job_offer = JobOffer.objects.get(id=job_offer_id)
+        job_offer.status = 'Approved'
+        job_offer.save()
+        return JsonResponse({'message': 'Job offer approved successfully'}, status=200)
+    except JobOffer.DoesNotExist:
+        return JsonResponse({'error': 'Job offer not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+def rejectJobOffer(request, job_offer_id):
+    try:
+        job_offer = JobOffer.objects.get(id=job_offer_id)
+        job_offer.status = 'Rejected'
+        job_offer.save()
+        return JsonResponse({'message': 'Job offer rejected successfully'}, status=200)
+    except JobOffer.DoesNotExist:
+        return JsonResponse({'error': 'Job offer not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@api_view(['GET'])
+def getCandidateApplications(request):
+    username = request.GET.get('username')
+    email = request.GET.get('email')
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+
+        # Fetch all related applications
+        applications = Application.objects.filter(applicant=user)
+        approved_applications = []
+        rejected_applications = []
+        under_review_applications = []
+
+        for application in applications:
+            application_data = {
+                "job_title": application.job.job_title,
+                "company": application.job.employer.company_name,
+                "logo": base64.b64encode(application.job.employer.logo.read()).decode('utf-8') if application.job.employer.logo else None,
+                "status": application.status,
+                "employment_term": application.job.employment_term,
+                "created_at": application.created_at,
+            }
+            if application.status == 'Approved':
+                approved_applications.append(application_data)
+            elif application.status == 'Rejected':
+                rejected_applications.append(application_data)
+            else:
+                under_review_applications.append(application_data)
+
+        return JsonResponse({
+            "message": "Success",
+            "approved_applications": approved_applications,
+            "rejected_applications": rejected_applications,
+            "under_review_applications": under_review_applications
+        }, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

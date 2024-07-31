@@ -16,7 +16,10 @@ import CandidateJobPosting from './components/roles/Candidate/JobPosting';
 import CandidateProfile from './components/roles/Candidate/CandidateProfile';
 import ApplyForJob from './components/roles/Candidate/ApplyForJob';
 import UpcomingInterviews from './components/roles/Employer/UpcomingInterviews';
-import CandidateUpcomingInterviews from './components/roles/Candidate/UpcomingInterviews'; // Import the CandidateUpcomingInterviews component
+import CandidateUpcomingInterviews from './components/roles/Candidate/UpcomingInterviews';
+import JobOfferForm from './components/roles/Employer/JobOfferForm';
+import CandidateJobOffers from './components/roles/Candidate/CandidateJobOffers';
+import ApplicationStatus from './components/roles/Candidate/ApplicationStatus';
 import { GlobalStateProvider } from './globalState/globalState';
 import './App.css';
 
@@ -42,7 +45,10 @@ const App = () => {
                     <Route path="/applyForJob/:company/:jobTitle/:jobId" element={<ApplyForJob />} />
                     <Route path="/candidateProfile" element={<CandidateProfile />} />
                     <Route path="/upcoming-interviews" element={<UpcomingInterviews />} />
-                    <Route path="/candidate-upcoming-interviews" element={<CandidateUpcomingInterviews />} /> {/* New route for CandidateUpcomingInterviews */}
+                    <Route path="/candidate-upcoming-interviews" element={<CandidateUpcomingInterviews />} />
+                    <Route path="/joboffer/:applicationId" element={<JobOfferForm />} />
+                    <Route path="/candidate-job-offers" element={<CandidateJobOffers />} />
+                    <Route path="/job-applications" element={<ApplicationStatus />} />
                 </Routes>
             </Router>
         </GlobalStateProvider>

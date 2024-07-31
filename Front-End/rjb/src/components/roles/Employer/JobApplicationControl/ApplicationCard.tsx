@@ -7,6 +7,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import EventIcon from '@mui/icons-material/Event';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CloseIcon from '@mui/icons-material/Close';
+import ActionButtons from './ActionButtons';
 
 interface Application {
   id: number;
@@ -16,8 +17,13 @@ interface Application {
   created_at: string;
 }
 
-const ApplicationCard: React.FC<{ application: Application }> = ({ application }) => {
-  const [expanded, setExpanded] = useState(true);
+interface ApplicationCardProps {
+  application: Application;
+  onReject: () => void; // New prop for handling rejection
+}
+
+const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, onReject }) => {
+  const [expanded, setExpanded] = useState(false);
   const [openModal, setOpenModal] = useState(false);
 
   const handleChange = () => {
@@ -49,13 +55,13 @@ const ApplicationCard: React.FC<{ application: Application }> = ({ application }
           '&:before': {
             display: 'none',
           },
-          backgroundColor: '#f5f5f5',
+          backgroundColor: '#ffffff', // Changed to white
         }}
       >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           sx={{
-            backgroundColor: '#e0e0e0',
+            backgroundColor: '#ffffff', // Changed to white
             borderRadius: '8px 8px 0 0',
           }}
         >
@@ -84,6 +90,25 @@ const ApplicationCard: React.FC<{ application: Application }> = ({ application }
               Download CV
             </Button>
           </Box>
+          {application.status !== 'Approved' && application.status !== 'Rejected' ? (
+            <Box mt={3}>
+              <ActionButtons applicationId={application.id.toString()} onReject={onReject} />
+            </Box>
+          ) : (
+            <Box mt={3} display="flex" alignItems="center" justifyContent="center" flexDirection="column">
+              {application.status === 'Approved' ? (
+                <>
+                  <CheckCircleIcon color="success" sx={{ fontSize: 40, mb: 1 }} />
+                  <Typography variant="h6" color="success.main">Application Approved</Typography>
+                </>
+              ) : (
+                <>
+                  <CloseIcon color="error" sx={{ fontSize: 40, mb: 1 }} />
+                  <Typography variant="h6" color="error.main">Application Rejected</Typography>
+                </>
+              )}
+            </Box>
+          )}
         </AccordionDetails>
       </Accordion>
 

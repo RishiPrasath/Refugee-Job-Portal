@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, searchJobPostings, viewJobDetails, getCandidateProfile, saveJob, getSavedJobs, removeSavedJob, submitJobApplication, getAppliedJobs, withdrawApplication, getCandidateUpcomingInterviews
+from .views import home, searchJobPostings, viewJobDetails, getCandidateProfile, saveJob, getSavedJobs, removeSavedJob, submitJobApplication, getAppliedJobs, withdrawApplication, getCandidateUpcomingInterviews, getCandidateJobOffers, approveJobOffer, rejectJobOffer, getCandidateApplications
 
 urlpatterns = [
     path('', home, name='candidate-home'),
@@ -13,4 +13,8 @@ urlpatterns = [
     path('getAppliedJobs', getAppliedJobs, name='getAppliedJobs'),
     path('withdrawApplication', withdrawApplication, name='withdrawApplication'),
     path('getCandidateUpcomingInterviews/', getCandidateUpcomingInterviews, name='getCandidateUpcomingInterviews'),
+    path('getCandidateJobOffers', getCandidateJobOffers, name='getCandidateJobOffers'),
+    path('approveJobOffer/<int:job_offer_id>/', approveJobOffer, name='approveJobOffer'),
+    path('rejectJobOffer/<int:job_offer_id>/', rejectJobOffer, name='rejectJobOffer'),
+    path('getCandidateApplications', getCandidateApplications, name='getCandidateApplications'),
 ]

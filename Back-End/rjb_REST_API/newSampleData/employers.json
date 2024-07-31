@@ -1,0 +1,302 @@
+[
+    {
+        "model": "rjb.employerprofile",
+        "pk": 18,
+        "fields": {
+            "user": 19,
+            "company_name": "Tech Corp",
+            "industry": "Information Technology",
+            "contact_phone": "+447911223344",
+            "location": "London, UK",
+            "website_url": "https://www.techcorp.com",
+            "logo": "logos\\19_18\\52484.jpg",
+            "description": "A leading technology company specializing in software development.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 38,
+        "fields": {
+            "user": 47,
+            "company_name": "Data Solutions",
+            "industry": "Data Analytics",
+            "contact_phone": "+447911556677",
+            "location": "Manchester, UK",
+            "website_url": "",
+            "logo": "logos\\47_None\\window.png",
+            "description": "Innovative company providing data analysis and visualization services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 39,
+        "fields": {
+            "user": 48,
+            "company_name": "Healthcare Inc",
+            "industry": "Healthcare",
+            "contact_phone": "+447911334455",
+            "location": "Birmingham, UK",
+            "website_url": "",
+            "logo": "logos\\48_None\\dots (1).png",
+            "description": "Dedicated to providing quality healthcare services to communities.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 40,
+        "fields": {
+            "user": 49,
+            "company_name": "Green Energy",
+            "industry": "Renewable Energy",
+            "contact_phone": "+447911667788",
+            "location": "Edinburgh, UK",
+            "website_url": "",
+            "logo": "logos\\49_None\\stack.png",
+            "description": "Pioneers in renewable energy solutions, focused on sustainability.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 41,
+        "fields": {
+            "user": 50,
+            "company_name": "Construction Co",
+            "industry": "Construction",
+            "contact_phone": "+447911778899",
+            "location": "Glasgow, UK",
+            "website_url": "",
+            "logo": "logos\\50_None\\stack.png",
+            "description": "Leading construction company known for quality and reliability.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 42,
+        "fields": {
+            "user": 51,
+            "company_name": "Auto Motors",
+            "industry": "Automotive",
+            "contact_phone": "+447911889900",
+            "location": "Bristol, UK",
+            "website_url": "",
+            "logo": "logos\\51_None\\dots (1).png",
+            "description": "Renowned automotive company specializing in innovative car designs.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 43,
+        "fields": {
+            "user": 52,
+            "company_name": "Retail Giant",
+            "industry": "Retail",
+            "contact_phone": "+447911990011",
+            "location": "Liverpool, UK",
+            "website_url": "",
+            "logo": "logos\\52_None\\stack.png",
+            "description": "Major retail chain offering a wide range of products at competitive prices.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 44,
+        "fields": {
+            "user": 53,
+            "company_name": "Financial Advisors",
+            "industry": "Finance",
+            "contact_phone": "+447911001122",
+            "location": "Leeds, UK",
+            "website_url": "",
+            "logo": "logos\\53_None\\dots (1).png",
+            "description": "Experienced financial advisors providing expert guidance and services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 45,
+        "fields": {
+            "user": 54,
+            "company_name": "Edu Institute",
+            "industry": "Education",
+            "contact_phone": "+447911112233",
+            "location": "Oxford, UK",
+            "website_url": "",
+            "logo": "logos\\54_None\\dots (1).png",
+            "description": "Premier educational institution offering a wide range of academic programs.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 46,
+        "fields": {
+            "user": 55,
+            "company_name": "Food Delight",
+            "industry": "Food & Beverage",
+            "contact_phone": "+447911223344",
+            "location": "York, UK",
+            "website_url": "",
+            "logo": "logos\\55_None\\resize.png",
+            "description": "Leading food and beverage company known for delicious and healthy options.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 47,
+        "fields": {
+            "user": 56,
+            "company_name": "Media House",
+            "industry": "Media",
+            "contact_phone": "+447911334455",
+            "location": "Cardiff, UK",
+            "website_url": "",
+            "logo": "logos\\56_None\\target.png",
+            "description": "Prominent media company offering comprehensive news and entertainment services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 48,
+        "fields": {
+            "user": 57,
+            "company_name": "Tech Solutions",
+            "industry": "Information Technology",
+            "contact_phone": "+447911445566",
+            "location": "Cambridge, UK",
+            "website_url": "",
+            "logo": "logos\\57_None\\dots.png",
+            "description": "Innovative IT company providing cutting-edge software solutions.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 49,
+        "fields": {
+            "user": 58,
+            "company_name": "Travel Experts",
+            "industry": "Travel & Tourism",
+            "contact_phone": "+447911556677",
+            "location": "Bath, UK",
+            "website_url": "",
+            "logo": "logos\\58_None\\window.png",
+            "description": "Experienced travel agency offering personalized travel plans and services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 50,
+        "fields": {
+            "user": 59,
+            "company_name": "Logistics Pro",
+            "industry": "Logistics",
+            "contact_phone": "+447911667788",
+            "location": "Sheffield, UK",
+            "website_url": "",
+            "logo": "logos\\59_None\\target.png",
+            "description": "Efficient logistics company ensuring timely and safe deliveries.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 51,
+        "fields": {
+            "user": 60,
+            "company_name": "Law Firm",
+            "industry": "Legal Services",
+            "contact_phone": "+447911778899",
+            "location": "Nottingham, UK",
+            "website_url": "",
+            "logo": "logos\\60_None\\dots (1).png",
+            "description": "Reputable law firm providing expert legal advice and representation.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 52,
+        "fields": {
+            "user": 61,
+            "company_name": "Manufacturing Inc",
+            "industry": "Manufacturing",
+            "contact_phone": "+447911889900",
+            "location": "Coventry, UK",
+            "website_url": "",
+            "logo": "logos\\61_None\\target.png",
+            "description": "Leading manufacturing company known for quality and innovation.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 53,
+        "fields": {
+            "user": 62,
+            "company_name": "Consulting Firm",
+            "industry": "Consulting",
+            "contact_phone": "+447911990011",
+            "location": "Brighton, UK",
+            "website_url": "",
+            "logo": "logos\\62_None\\stack.png",
+            "description": "Expert consulting services helping businesses achieve their goals.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 54,
+        "fields": {
+            "user": 63,
+            "company_name": "Real Estate Pro",
+            "industry": "Real Estate",
+            "contact_phone": "+447911001122",
+            "location": "Reading, UK",
+            "website_url": "",
+            "logo": "logos\\63_None\\dots.png",
+            "description": "Top real estate firm offering a wide range of property services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 55,
+        "fields": {
+            "user": 64,
+            "company_name": "Telecom Inc",
+            "industry": "Telecommunications",
+            "contact_phone": "+447911112233",
+            "location": "Milton Keynes, UK",
+            "website_url": "",
+            "logo": "logos\\64_None\\resize.png",
+            "description": "Leading telecommunications company providing reliable communication services.",
+            "is_active": true
+        }
+    },
+    {
+        "model": "rjb.employerprofile",
+        "pk": 56,
+        "fields": {
+            "user": 65,
+            "company_name": "Pharma Pro",
+            "industry": "Pharmaceuticals",
+            "contact_phone": "+447911223344",
+            "location": "Aberdeen, UK",
+            "website_url": "",
+            "logo": "logos\\65_None\\window.png",
+            "description": "Innovative pharmaceutical company committed to improving health outcomes.",
+            "is_active": true
+        }
+    }
+]

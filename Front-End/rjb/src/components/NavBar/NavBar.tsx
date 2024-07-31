@@ -6,7 +6,8 @@ import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday'; // Import calendar icon
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline'; // Import icon
 import { useTheme } from '@mui/material/styles';
 import { useGlobalState } from '../../globalState/globalState';
 
@@ -38,7 +39,7 @@ const NavBar: React.FC = () => {
     fontSize: '0.8rem',
     color: 'inherit',
     textDecoration: 'none',
-    textTransform: 'none' as 'none', // Corrected type
+    textTransform: 'none' as 'none',
   });
 
   const renderNavItems = (
@@ -65,7 +66,7 @@ const NavBar: React.FC = () => {
                 <ListItemText primary="View Job Postings" />
               </ListItem>
               <ListItem button component={Link} to="/upcoming-interviews">
-                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} /> {/* Updated icon */}
+                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} />
                 <ListItemText primary="Upcoming Interviews" />
               </ListItem>
             </>
@@ -83,12 +84,20 @@ const NavBar: React.FC = () => {
                 <ListItemText primary="Search Job Postings" />
               </ListItem>
               <ListItem button component={Link} to="/candidate-upcoming-interviews">
-                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} /> {/* Updated icon */}
+                <CalendarTodayIcon style={{ marginRight: '0.5rem' }} />
                 <ListItemText primary="Upcoming Interviews" />
+              </ListItem>
+              <ListItem button component={Link} to="/candidate-job-offers">
+                <WorkOutlineIcon style={{ marginRight: '0.5rem' }} />
+                <ListItemText primary="Job Offers" />
               </ListItem>
               <ListItem button component={Link} to="/profile">
                 <AccountCircleIcon style={{ marginRight: '0.5rem' }} />
                 <ListItemText primary="Profile" />
+              </ListItem>
+              <ListItem button component={Link} to="/job-applications">
+                <WorkOutlineIcon style={{ marginRight: '0.5rem' }} />
+                <ListItemText primary="Job Applications" />
               </ListItem>
             </>
           )}
@@ -167,7 +176,7 @@ const NavBar: React.FC = () => {
                         View Job Postings
                       </Button>
                       <Button color="inherit" component={Link} to="/upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
-                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} /> {/* Updated icon */}
+                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
                         Upcoming Interviews
                       </Button>
                     </>
@@ -185,12 +194,20 @@ const NavBar: React.FC = () => {
                         Search Job Postings
                       </Button>
                       <Button color="inherit" component={Link} to="/candidate-upcoming-interviews" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
-                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} /> {/* Updated icon */}
+                        <CalendarTodayIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
                         Upcoming Interviews
+                      </Button>
+                      <Button color="inherit" component={Link} to="/candidate-job-offers" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
+                        <WorkOutlineIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        Job Offers
                       </Button>
                       <Button color="inherit" component={Link} to="/profile" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
                         <AccountCircleIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
                         Profile
+                      </Button>
+                      <Button color="inherit" component={Link} to="/job-applications" style={{ ...getButtonStyle(), fontSize: '0.8rem' }}>
+                        <WorkOutlineIcon style={{ marginRight: '0.4rem', fontSize: '0.8rem' }} />
+                        Job Applications
                       </Button>
                     </>
                   )}

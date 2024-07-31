@@ -1,28 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Typography, Box, Grid, Avatar, Chip, Accordion, AccordionSummary, AccordionDetails, Button } from '@mui/material';
+import { Typography, Box, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import EmailIcon from '@mui/icons-material/Email';
-import PhoneIcon from '@mui/icons-material/Phone';
-import CakeIcon from '@mui/icons-material/Cake';
-import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import GitHubIcon from '@mui/icons-material/GitHub';
-import WorkIcon from '@mui/icons-material/Work';
-import SchoolIcon from '@mui/icons-material/School';
-import SkillIcon from '@mui/icons-material/Build';
-import InfoIcon from '@mui/icons-material/Info';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import SaveIcon from '@mui/icons-material/Save';
-import DescriptionIcon from '@mui/icons-material/Description';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import EventIcon from '@mui/icons-material/Event';
 import CandidateProfileSection from './JobApplicationControl/CandidateProfileSection';
 import ApplicationCard from './JobApplicationControl/ApplicationCard';
-import ActionButtons from './JobApplicationControl/ActionButtons';
 import InterviewCard from './JobApplicationControl/InterviewCard';
+import JobOfferComponent from './JobApplicationControl/JobOfferComponent';
 import { useGlobalState } from '../../../globalState/globalState';
 
 interface CandidateProfile {
@@ -90,67 +73,130 @@ interface Interview {
   candidate_email: string;
 }
 
+interface JobOffer {
+  job_offer_document: string;
+  additional_details: string;
+  offer_datetime: string;
+  status: string;
+}
+
 const JobApplicationControl: React.FC = () => {
   const { applicationId } = useParams<{ applicationId: string }>();
   const navigate = useNavigate();
   const globalState = useGlobalState();
   const [profile, setProfile] = useState<CandidateProfile | null>(null);
   const [profileFetched, setProfileFetched] = useState(false);
-  const [upcomingInterviews, setUpcomingInterviews] = useState<Interview[]>([]);
+  const [scheduledInterviews, setScheduledInterviews] = useState<Interview[]>([]);
+  const [rescheduledInterviews, setRescheduledInterviews] = useState<Interview[]>([]);
   const [closedInterviews, setClosedInterviews] = useState<Interview[]>([]);
+  const [cancelledInterviews, setCancelledInterviews] = useState<Interview[]>([]);
   const [interviewsFetched, setInterviewsFetched] = useState(false);
+  const [expandedUpcoming, setExpandedUpcoming] = useState<string | false>(false);
+  const [expandedClosed, setExpandedClosed] = useState<string | false>(false);
+  const [refresh, setRefresh] = useState(false); // New state to trigger refresh
+  const [jobOffer, setJobOffer] = useState<JobOffer | null>(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/employers/getCandidateApplicationDetails/${applicationId}/`);
-        const data = await response.json();
-        if (response.ok) {
-          setProfile(data);
-          setProfileFetched(true); // Set profile fetched to true
-        } else {
-          console.error('Error fetching profile:', data.error);
-        }
-      } catch (error) {
-        console.error('Error fetching profile:', error);
+  const fetchScheduledInterviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus?application_id=${applicationId}&status=Scheduled`);
+      const data = await response.json();
+      if (response.ok) {
+        setScheduledInterviews(data.interviews);
+      } else {
+        console.error('Error fetching Scheduled interviews:', data.error);
       }
-    };
-
-    fetchProfile();
-  }, [applicationId, globalState]);
-
-  useEffect(() => {
-    const fetchInterviews = async (status: string) => {
-      if (!applicationId) return;
-      try {
-        const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus/?application_id=${applicationId}&status=${status}`);
-        const data = await response.json();
-        if (response.ok) {
-
-          console.log("Interviews:", data.interviews);
-
-          if (status === 'Scheduled' || status === 'Rescheduled') setUpcomingInterviews(data.interviews);
-          else if (status === 'Cancelled' || status === 'Closed') setClosedInterviews(data.interviews);
-        } else {
-          console.error('Error fetching interviews:', data.error);
-        }
-      } catch (error) {
-        console.error('Error fetching interviews:', error);
-      } finally {
-        setInterviewsFetched(true);
-      }
-    };
-
-    if (profileFetched) { // Only fetch interviews if profile is fetched
-      fetchInterviews('Scheduled');
-      fetchInterviews('Rescheduled');
-      fetchInterviews('Cancelled');
-      fetchInterviews('Closed');
+    } catch (error) {
+      console.error('Error fetching Scheduled interviews:', error);
     }
-  }, [applicationId, profileFetched]);
+  };
+
+  const fetchRescheduledInterviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus?application_id=${applicationId}&status=Rescheduled`);
+      const data = await response.json();
+      if (response.ok) {
+        setRescheduledInterviews(data.interviews);
+      } else {
+        console.error('Error fetching Rescheduled interviews:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching Rescheduled interviews:', error);
+    }
+  };
+
+  const fetchClosedInterviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus?application_id=${applicationId}&status=Closed`);
+      const data = await response.json();
+      if (response.ok) {
+        setClosedInterviews(data.interviews);
+      } else {
+        console.error('Error fetching Closed interviews:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching Closed interviews:', error);
+    }
+  };
+
+  const fetchCancelledInterviews = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getInterviewsByStatus?application_id=${applicationId}&status=Cancelled`);
+      const data = await response.json();
+      if (response.ok) {
+        setCancelledInterviews(data.interviews);
+      } else {
+        console.error('Error fetching Cancelled interviews:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching Cancelled interviews:', error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getCandidateApplicationDetails/${applicationId}/`);
+      const data = await response.json();
+      if (response.ok) {
+        setProfile(data);
+        setProfileFetched(true); // Set profile fetched to true
+      } else {
+        console.error('Error fetching profile:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+    }
+  };
+
+  const fetchJobOffer = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/getJobOffer/${applicationId}/`);
+      const data = await response.json();
+      if (response.ok) {
+        if (data.id) {
+          setJobOffer(data);
+        } else {
+          console.log(data.message); // Handle the case where no job offer is associated
+        }
+      } else {
+        console.error('Error fetching job offer:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching job offer:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchProfile();
+    fetchJobOffer();
+    fetchScheduledInterviews();
+    fetchRescheduledInterviews();
+    fetchClosedInterviews();
+    fetchCancelledInterviews();
+    setInterviewsFetched(true);
+  }, [applicationId, globalState, refresh]); // Add refresh to dependency array
 
   return (
-    <Box p={3}>
+    <Box p={3} sx={{ backgroundColor: '#ffffff' }}>
       <Typography variant="h4" gutterBottom>
         Job Application Details
       </Typography>
@@ -158,52 +204,68 @@ const JobApplicationControl: React.FC = () => {
         <Box padding={3}>
           <CandidateProfileSection profile={profile} />
           <Box mt={3}>
-            <ApplicationCard application={profile.application} />
+            <ApplicationCard application={profile.application} onReject={() => setRefresh(!refresh)} />
           </Box>
-          <Box mt={3}>
-            <ActionButtons applicationId={applicationId || ''} />
-          </Box>
+          {jobOffer && (
+            <Box mt={3}>
+              <JobOfferComponent applicationId={applicationId || ''} />
+            </Box>
+          )}
           {interviewsFetched && (
             <Box mt={3}>
-              {upcomingInterviews.length > 0 && (
-                <Accordion sx={{
-                  mb: 4,
-                  boxShadow: 'none',
-                  '&:before': {
-                    display: 'none',
-                  },
-                  backgroundColor: '#ffffff', // Changed to white
-                }}>
+              {(scheduledInterviews.length > 0 || rescheduledInterviews.length > 0) && (
+                <Accordion
+                  expanded={expandedUpcoming === 'upcoming'}
+                  onChange={() => setExpandedUpcoming(expandedUpcoming ? false : 'upcoming')}
+                  sx={{
+                    mb: 4,
+                    boxShadow: 'none', // Standardized box shadow
+                    '&:before': {
+                      display: 'none',
+                    },
+                    backgroundColor: '#ffffff', // Standardized background color
+                  }}
+                >
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{
-                    backgroundColor: '#e0e0e0',
+                    backgroundColor: '#ffffff', // Standardized background color
                     borderRadius: '8px 8px 0 0',
                   }}>
                     <Typography variant="h5">Scheduled/Rescheduled Interviews</Typography>
                   </AccordionSummary>
-                  <AccordionDetails>
-                    {upcomingInterviews.map(interview => (
+                  <AccordionDetails sx={{ p: 3 }}>
+                    {scheduledInterviews.map(interview => (
+                      <InterviewCard key={interview.id} interview={interview} />
+                    ))}
+                    {rescheduledInterviews.map(interview => (
                       <InterviewCard key={interview.id} interview={interview} />
                     ))}
                   </AccordionDetails>
                 </Accordion>
               )}
-              {closedInterviews.length > 0 && (
-                <Accordion sx={{
-                  mb: 4,
-                  boxShadow: 'none',
-                  '&:before': {
-                    display: 'none',
-                  },
-                  backgroundColor: '#ffffff', // Changed to white
-                }}>
+              {(closedInterviews.length > 0 || cancelledInterviews.length > 0) && (
+                <Accordion
+                  expanded={expandedClosed === 'closed'}
+                  onChange={() => setExpandedClosed(expandedClosed ? false : 'closed')}
+                  sx={{
+                    mb: 4,
+                    boxShadow: 'none', // Standardized box shadow
+                    '&:before': {
+                      display: 'none',
+                    },
+                    backgroundColor: '#ffffff', // Standardized background color
+                  }}
+                >
                   <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{
-                    backgroundColor: '#e0e0e0',
+                    backgroundColor: '#ffffff', // Standardized background color
                     borderRadius: '8px 8px 0 0',
                   }}>
                     <Typography variant="h5">Cancelled/Closed Interviews</Typography>
                   </AccordionSummary>
-                  <AccordionDetails>
+                  <AccordionDetails sx={{ p: 3 }}>
                     {closedInterviews.map(interview => (
+                      <InterviewCard key={interview.id} interview={interview} />
+                    ))}
+                    {cancelledInterviews.map(interview => (
                       <InterviewCard key={interview.id} interview={interview} />
                     ))}
                   </AccordionDetails>

@@ -62,7 +62,7 @@ interface Application {
 }
 
 const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ profile }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   const handleChange = () => {
     setExpanded(!expanded);
@@ -78,13 +78,13 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
         '&:before': {
           display: 'none',
         },
-        backgroundColor: '#f5f5f5',
+        backgroundColor: '#ffffff', // Changed to white
       }}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
         sx={{
-          backgroundColor: '#e0e0e0',
+          backgroundColor: '#ffffff', // Changed to white
           borderRadius: '8px 8px 0 0',
         }}
       >
@@ -127,7 +127,7 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
             <SchoolIcon sx={{ mr: 1 }} /> Qualifications
           </Typography>
           {profile.qualifications.map(qualification => (
-            <Box key={qualification.id} p={2} sx={{ backgroundColor: 'white', borderRadius: '8px', mb: 2 }}>
+            <Box key={qualification.id} p={2} sx={{ backgroundColor: '#ffffff', borderRadius: '8px', mb: 2 }}>
               <Typography variant="body1">
                 <strong>{qualification.school}</strong>, {qualification.qualification} ({qualification.start_year} - {qualification.end_year})
               </Typography>
@@ -139,7 +139,7 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
             <WorkIcon sx={{ mr: 1 }} /> Work Experiences
           </Typography>
           {profile.workExperiences.map(experience => (
-            <Box key={experience.id} p={2} sx={{ backgroundColor: 'white', borderRadius: '8px' }}>
+            <Box key={experience.id} p={2} sx={{ backgroundColor: '#ffffff', borderRadius: '8px' }}>
               <Typography variant="body2">
                 <strong>{experience.company}</strong>, {experience.role} ({experience.start_year} - {experience.end_year})
               </Typography>

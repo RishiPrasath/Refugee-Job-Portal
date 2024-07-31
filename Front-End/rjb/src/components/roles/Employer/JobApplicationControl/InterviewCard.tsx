@@ -28,7 +28,7 @@ interface Interview {
 
 const InterviewCard: React.FC<{ interview: Interview }> = ({ interview }) => {
   return (
-    <Box sx={{ mb: 3, p: 2, backgroundColor: '#f5f5f5', borderRadius: '8px', boxShadow: 1 }}>
+    <Box sx={{ mb: 3, p: 2, backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: 1 }}>
       <Box display="flex" flexDirection="column" gap={2}>
         <Box display="flex" alignItems="center">
           <EventIcon sx={{ mr: 1 }} />

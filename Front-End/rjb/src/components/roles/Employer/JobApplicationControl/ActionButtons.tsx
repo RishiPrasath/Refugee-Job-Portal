@@ -7,13 +7,43 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 interface ActionButtonsProps {
   applicationId: string;
+  onReject: () => void; // New prop for handling rejection
 }
 
-const ActionButtons: React.FC<ActionButtonsProps> = ({ applicationId }) => {
+const ActionButtons: React.FC<ActionButtonsProps> = ({ applicationId, onReject }) => {
   const navigate = useNavigate();
 
   const handleInterviewClick = () => {
     navigate(`/create-interview/${applicationId}`);
+  };
+
+  const handleApproveClick = () => {
+    navigate(`/joboffer/${applicationId}`);
+  };
+
+  const handleRejectClick = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/employers/rejectApplication/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ application_id: applicationId }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        alert('Application rejected successfully');
+        onReject(); // Call the onReject callback
+      } else {
+        const errorData = await response.json();
+        console.error('Error rejecting application:', errorData);
+        alert('An error occurred while rejecting the application');
+      }
+    } catch (error) {
+      console.error('Error rejecting application:', error);
+      alert('An error occurred while rejecting the application');
+    }
   };
 
   return (
@@ -27,6 +57,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ applicationId }) => {
             startIcon={<CheckIcon />}
             fullWidth
             sx={{ borderRadius: '20px' }}
+            onClick={handleApproveClick}
           >
             Approve
           </Button>
@@ -38,6 +69,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ applicationId }) => {
             startIcon={<CloseIcon />}
             fullWidth
             sx={{ borderRadius: '20px' }}
+            onClick={handleRejectClick}
           >
             Reject
           </Button>

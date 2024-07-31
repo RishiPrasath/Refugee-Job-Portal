@@ -1,0 +1,277 @@
+[
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 3,
+        "fields": {
+            "user": 27,
+            "full_name": "Mary Smith",
+            "date_of_birth": "1985-05-15",
+            "contact_phone": "+447911987654",
+            "emergency_contact_name": "John Smith",
+            "emergency_contact_phone": "+447911123987",
+            "linkedin_profile": "https://www.linkedin.com/in/marysmith",
+            "github_profile": "https://github.com/marysmith",
+            "summary": "Skilled data analyst with extensive experience in data visualization and analysis.",
+            "accessibility_requirements": "",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures/27_3/beautiful-blonde-woman-with-makeup-avatar.jpg",
+            "status": "active",
+            "case_worker": 1,
+            "skills": [
+                6,
+                9,
+                148
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 18,
+        "fields": {
+            "user": 84,
+            "full_name": "Amira Khan",
+            "date_of_birth": "1995-04-15",
+            "contact_phone": "+447911111111",
+            "emergency_contact_name": "Amina Khan",
+            "emergency_contact_phone": "+447911222222",
+            "linkedin_profile": "https://www.linkedin.com/in/amirakhan",
+            "github_profile": "https://github.com/amirakhan",
+            "summary": "Experienced social worker with a background in community support and advocacy.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures\\84_18\\female-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 5,
+            "skills": [
+                149,
+                150,
+                164
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 19,
+        "fields": {
+            "user": 85,
+            "full_name": "Ali Hussein",
+            "date_of_birth": "1988-11-23",
+            "contact_phone": "+447911333333",
+            "emergency_contact_name": "Fatima Hussein",
+            "emergency_contact_phone": "+447911444444",
+            "linkedin_profile": "https://www.linkedin.com/in/alihussein",
+            "github_profile": "https://github.com/alihussein",
+            "summary": "Skilled mechanical engineer with experience in maintenance and repair of industrial machinery.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Asylum Seeker",
+            "profile_picture": "profile_pictures\\85_19\\male-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 4,
+            "skills": [
+                151,
+                152,
+                163
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 20,
+        "fields": {
+            "user": 86,
+            "full_name": "Sara Ahmed",
+            "date_of_birth": "1991-05-29",
+            "contact_phone": "+447911555555",
+            "emergency_contact_name": "Ahmed Ali",
+            "emergency_contact_phone": "+447911666666",
+            "linkedin_profile": "https://www.linkedin.com/in/saraahmed",
+            "github_profile": "https://github.com/saraahmed",
+            "summary": "Experienced nurse with a background in patient care and emergency response.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures\\86_20\\female-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 1,
+            "skills": [
+                153,
+                154,
+                165
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 21,
+        "fields": {
+            "user": 87,
+            "full_name": "Mohammed Rahman",
+            "date_of_birth": "1984-09-11",
+            "contact_phone": "+447911777777",
+            "emergency_contact_name": "Ayesha Rahman",
+            "emergency_contact_phone": "+447911888888",
+            "linkedin_profile": "https://www.linkedin.com/in/mohammedrahman",
+            "github_profile": "https://github.com/mohammedrahman",
+            "summary": "IT professional with extensive experience in network administration and cybersecurity.",
+            "accessibility_requirements": "Wheelchair accessible office",
+            "immigration_status": "Asylum Seeker",
+            "profile_picture": "profile_pictures\\87_21\\male-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 4,
+            "skills": [
+                155,
+                156,
+                166
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 22,
+        "fields": {
+            "user": 88,
+            "full_name": "Leila Hassan",
+            "date_of_birth": "1993-07-21",
+            "contact_phone": "+447911999999",
+            "emergency_contact_name": "Hassan Ahmed",
+            "emergency_contact_phone": "+447911000000",
+            "linkedin_profile": "https://www.linkedin.com/in/leilahassan",
+            "github_profile": "https://github.com/leilahassan",
+            "summary": "Data scientist with a passion for using data to drive decision-making.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures\\88_22\\female-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 7,
+            "skills": [
+                6,
+                57,
+                167
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 23,
+        "fields": {
+            "user": 89,
+            "full_name": "Yousef Ali",
+            "date_of_birth": "1995-03-18",
+            "contact_phone": "+447911111222",
+            "emergency_contact_name": "Aisha Ali",
+            "emergency_contact_phone": "+447911333444",
+            "linkedin_profile": "https://www.linkedin.com/in/yousefali",
+            "github_profile": "https://github.com/yousefali",
+            "summary": "Software developer with a focus on backend systems and API development.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Asylum Seeker",
+            "profile_picture": "profile_pictures\\89_23\\male-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 4,
+            "skills": [
+                9,
+                13,
+                157
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 24,
+        "fields": {
+            "user": 90,
+            "full_name": "Farah Abdi",
+            "date_of_birth": "1986-12-01",
+            "contact_phone": "+447911555666",
+            "emergency_contact_name": "Omar Abdi",
+            "emergency_contact_phone": "+447911777888",
+            "linkedin_profile": "https://www.linkedin.com/in/farahabdi",
+            "github_profile": "https://github.com/farahabdi",
+            "summary": "Experienced teacher with a background in primary education and curriculum development.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures\\90_24\\female-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 7,
+            "skills": [
+                158,
+                159,
+                168
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 25,
+        "fields": {
+            "user": 91,
+            "full_name": "Rahim Bakshi",
+            "date_of_birth": "1990-10-10",
+            "contact_phone": "+447911999000",
+            "emergency_contact_name": "Sadia Bakshi",
+            "emergency_contact_phone": "+447911888999",
+            "linkedin_profile": "https://www.linkedin.com/in/rahimbakshi",
+            "github_profile": "https://github.com/rahimbakshi",
+            "summary": "Professional chef with expertise in culinary arts and kitchen management.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Asylum Seeker",
+            "profile_picture": "profile_pictures\\91_25\\male-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 7,
+            "skills": [
+                160,
+                161,
+                169
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 26,
+        "fields": {
+            "user": 92,
+            "full_name": "Zahra Ali",
+            "date_of_birth": "1983-06-22",
+            "contact_phone": "+447911444555",
+            "emergency_contact_name": "Mohammed Ali",
+            "emergency_contact_phone": "+447911666777",
+            "linkedin_profile": "https://www.linkedin.com/in/zahraali",
+            "github_profile": "https://github.com/zahraali",
+            "summary": "Marketing manager with a talent for digital marketing strategies and content creation.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Refugee",
+            "profile_picture": "profile_pictures\\92_26\\female-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 6,
+            "skills": [
+                52,
+                162,
+                170
+            ]
+        }
+    },
+    {
+        "model": "rjb.candidateprofile",
+        "pk": 27,
+        "fields": {
+            "user": 93,
+            "full_name": "Hassan Abdullah",
+            "date_of_birth": "1997-01-30",
+            "contact_phone": "+447911777888",
+            "emergency_contact_name": "Nadia Abdullah",
+            "emergency_contact_phone": "+447911888999",
+            "linkedin_profile": "https://www.linkedin.com/in/hassanabdullah",
+            "github_profile": "https://github.com/hassanabdullah",
+            "summary": "Junior software developer with a passion for coding and learning new technologies.",
+            "accessibility_requirements": "None",
+            "immigration_status": "Asylum Seeker",
+            "profile_picture": "profile_pictures\\93_27\\male-profile-placeholder.jpg",
+            "status": "",
+            "case_worker": 1,
+            "skills": [
+                6,
+                8,
+                13
+            ]
+        }
+    }
+]
