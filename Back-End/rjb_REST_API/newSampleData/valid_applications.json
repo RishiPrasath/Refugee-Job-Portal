@@ -1,0 +1,29 @@
+[
+    {
+        "id": 2,
+        "job": 2,
+        "applicant": 87,
+        "cover_letter": "Hello World",
+        "cv": "/media/C%3A/Users/Admin/Documents/GitHub/E-Learning_App/Refugee-Job-Portal/Back-End/rjb_REST_API/fileUploads/jobApplicationResumes/19_18/87_21/2/DummyPDF.pdf",
+        "status": "Approved",
+        "created_at": "2024-07-16T13:28:10.431054+00:00"
+    },
+    {
+        "id": 3,
+        "job": 3,
+        "applicant": 89,
+        "cover_letter": "Please consider my application ",
+        "cv": "/media/C%3A/Users/Admin/Documents/GitHub/E-Learning_App/Refugee-Job-Portal/Back-End/rjb_REST_API/fileUploads/jobApplicationResumes/19_18/89_23/3/Rishi%20Prasath%20-%20Software%20Engineer.docx%20(1).pdf",
+        "status": "Rejected",
+        "created_at": "2024-07-30T14:57:01.506241+00:00"
+    },
+    {
+        "id": 4,
+        "job": 27,
+        "applicant": 87,
+        "cover_letter": "Please consider ",
+        "cv": "/media/C%3A/Users/Admin/Documents/GitHub/E-Learning_App/Refugee-Job-Portal/Back-End/rjb_REST_API/fileUploads/jobApplicationResumes/57_48/87_21/27/Rishi%20Prasath%20-%20Software%20Engineer%202.docx.pdf",
+        "status": "Submitted",
+        "created_at": "2024-07-31T18:50:04.169259+00:00"
+    }
+]

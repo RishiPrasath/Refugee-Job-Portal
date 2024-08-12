@@ -70,6 +70,7 @@ def login(request):
             full_name = CaseWorkerProfile.objects.get(user=user).full_name
 
         response_data = {
+            'id': user.id,
             "message": "Login successful",
             "status": "success",
             "username": user.username,

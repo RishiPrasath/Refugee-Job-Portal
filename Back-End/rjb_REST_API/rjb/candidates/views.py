@@ -12,6 +12,8 @@ from datetime import datetime, time
 from django.core.files.base import ContentFile
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+import json
+from django.views.decorators.csrf import csrf_exempt
 
 @api_view(['GET'])
 def home(request):
@@ -29,12 +31,9 @@ def searchJobPostings(request):
     print("query: ", query)
     print("immigration_status: ", immigration_status)
 
-
     filters = Q(job_title__icontains=query) | Q(job_description__icontains=query) | Q(requirements__icontains=query) | Q(location__icontains=query) | Q(compensation_amount__icontains=query) | Q(compensation_type__icontains=query) | Q(job_type__icontains=query) | Q(employment_term__icontains=query) | Q(employer__company_name__icontains=query) | Q(employer__industry__icontains=query) | Q(skills__skill_name__icontains=query)
 
     if immigration_status == 'Asylum Seeker':
-
-
         filters &= Q(ISL=True) #Important!
 
     if query:
@@ -105,7 +104,7 @@ def getCandidateProfile(request):
         
         profile_data = {
             'full_name': candidate_profile.full_name,
-            'email': user.email,
+            'email': candidate_profile.user.email,
             'immigration_status': candidate_profile.immigration_status,
             'accessibility_requirements': candidate_profile.accessibility_requirements,
             'contact_phone': candidate_profile.contact_phone,
@@ -504,6 +503,358 @@ def getCandidateApplications(request):
             "rejected_applications": rejected_applications,
             "under_review_applications": under_review_applications
         }, status=200)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+@api_view(['POST'])
+def updateProfile(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            profile_data = data.get('profile')
+
+            # Fetch the user and profile
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+
+            # Update the profile fields
+            candidate_profile.full_name = profile_data.get('full_name', candidate_profile.full_name)
+            candidate_profile.contact_phone = profile_data.get('contact_phone', candidate_profile.contact_phone)
+            candidate_profile.date_of_birth = profile_data.get('date_of_birth', candidate_profile.date_of_birth)
+            candidate_profile.emergency_contact_name = profile_data.get('emergency_contact_name', candidate_profile.emergency_contact_name)
+            candidate_profile.emergency_contact_phone = profile_data.get('emergency_contact_phone', candidate_profile.emergency_contact_phone)
+            candidate_profile.linkedin_profile = profile_data.get('linkedin_profile', candidate_profile.linkedin_profile)
+            candidate_profile.github_profile = profile_data.get('github_profile', candidate_profile.github_profile)
+            candidate_profile.immigration_status = profile_data.get('immigration_status', candidate_profile.immigration_status)
+            candidate_profile.accessibility_requirements = profile_data.get('accessibility_requirements', candidate_profile.accessibility_requirements)
+            candidate_profile.summary = profile_data.get('summary', candidate_profile.summary)
+
+            candidate_profile.save()
+
+            return JsonResponse({'message': 'Profile updated successfully'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+@api_view(['POST'])
+def updateSkills(request):
+    try:
+        data = json.loads(request.body)
+        username = data.get('username')
+        email = data.get('email')
+        updated_skills = data.get('skills', [])
+
+        # Debugging information
+        print(f"Received data: username={username}, email={email}, updated_skills={updated_skills}")
+
+        user = User.objects.get(username=username, email=email)
+        candidate = CandidateProfile.objects.get(user=user)
+
+        skill_names = [skill.skill_name for skill in candidate.skills.all()]
+        print("Candidate skills before update: ", skill_names)
+
+
+
+        # Create or update skills
+        skill_objects = []
+        for skill_data in updated_skills:
+            skill, created = Skill.objects.get_or_create(skill_name=skill_data['skill_name'], defaults={'description': skill_data['description']})
+            skill_objects.append(skill)
+
+        # Get current skills for the candidate
+        current_skills = CandidateHasSkill.objects.filter(candidate=candidate)
+
+        # Remove skills that are not in the updated list
+        for candidate_skill in current_skills:
+            if candidate_skill.skill not in skill_objects:
+                candidate_skill.delete()
+
+        # Add new skills
+        for skill in skill_objects:
+            CandidateHasSkill.objects.get_or_create(candidate=candidate, skill=skill)
+
+        skill_names = [skill.skill_name for skill in skill_objects]
+        print("Candidate's new skills: ", skill_names)
+
+        return JsonResponse({'message': 'Skills updated successfully'}, status=200)
+
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'User not found'}, status=404)
+    except CandidateProfile.DoesNotExist:
+        return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+    except Exception as e:
+        # Catch any other exceptions and print the error for debugging
+        print(f"Error updating skills: {str(e)}")
+        return JsonResponse({'error': str(e)}, status=500)
+
+@api_view(['POST'])
+def updateQualifications(request):
+    # Skeleton implementation
+    return JsonResponse({'message': 'Qualifications update endpoint'}, status=200)
+
+@api_view(['POST'])
+def updateWorkExperiences(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            updated_experience = data.get('updatedExperience')
+
+            #print the recieved data
+            print("username: ", username)
+            print("email: ", email)
+            print("updated_experience: ", updated_experience)
+
+
+
+
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+            work_experience = WorkExperience.objects.get(id=updated_experience['id'], candidate=candidate_profile)
+
+            work_experience.company = updated_experience['company']
+            work_experience.role = updated_experience['role']
+            work_experience.start_year = updated_experience['start_year']
+            work_experience.end_year = updated_experience['end_year']
+            work_experience.description = updated_experience['description']
+            work_experience.save()
+
+            return JsonResponse({'message': 'Work experience updated successfully'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except WorkExperience.DoesNotExist:
+            return JsonResponse({'error': 'Work experience not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+
+@api_view(['GET'])
+def getAllSkills(request):
+    skills = Skill.objects.all()
+    skill_list = [{'id': skill.id, 'skill_name': skill.skill_name} for skill in skills]
+    return JsonResponse(skill_list, safe=False)
+
+
+@csrf_exempt
+def addWorkExperience(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            new_experience = data.get('newExperience')
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+
+            work_experience = WorkExperience(
+                company=new_experience['company'],
+                role=new_experience['role'],
+                start_year=new_experience['start_year'],
+                end_year=new_experience['end_year'],
+                description=new_experience['description'],
+                candidate=candidate_profile
+            )
+            work_experience.save()
+
+            return JsonResponse({'message': 'Work experience added successfully'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+
+@csrf_exempt
+def deleteWorkExperience(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            experience_id = data.get('experienceId')
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+            work_experience = WorkExperience.objects.get(id=experience_id, candidate=candidate_profile)
+
+            work_experience.delete()
+
+            return JsonResponse({'message': 'Work experience deleted successfully'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except WorkExperience.DoesNotExist:
+            return JsonResponse({'error': 'Work experience not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+    
+
+
+
+@csrf_exempt
+def addQualification(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            new_qualification = data.get('newQualification')
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+
+            qualification = Qualification(
+                school=new_qualification['school'],
+                qualification=new_qualification['qualification'],
+                start_year=new_qualification['start_year'],
+                end_year=new_qualification['end_year'],
+                candidate=candidate_profile
+            )
+            qualification.save()
+
+            print("Qualification added :")   
+
+            #print the qualification data
+            print("Qualification data: ", qualification.school, qualification.qualification, qualification.start_year, qualification.end_year)
+
+
+
+
+            # Return the newly created qualification
+            return JsonResponse({
+                'id': qualification.id,
+                'school': qualification.school,
+                'qualification': qualification.qualification,
+                'start_year': qualification.start_year,
+                'end_year': qualification.end_year
+            }, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def updateQualification(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            updated_qualification = data.get('updatedQualification')
+            print(f'Data: {data}, Username: {username}, Email: {email}, Updated Qualification: {updated_qualification}')
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+            qualification = Qualification.objects.get(id=updated_qualification['id'], candidate=candidate_profile)
+
+            # Update qualification fields
+            qualification.school = updated_qualification['school']
+            qualification.qualification = updated_qualification['qualification']
+            qualification.start_year = updated_qualification['start_year']
+            qualification.end_year = updated_qualification['end_year']
+            qualification.save()
+
+            # Return the updated qualification data
+            return JsonResponse({
+                'id': qualification.id,
+                'school': qualification.school,
+                'qualification': qualification.qualification,
+                'start_year': qualification.start_year,
+                'end_year': qualification.end_year,
+                'message': 'Qualification updated successfully'
+            }, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except Qualification.DoesNotExist:
+            return JsonResponse({'error': 'Qualification not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+@csrf_exempt
+def deleteQualification(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            username = data.get('username')
+            email = data.get('email')
+            qualification_id = data.get('qualificationId')
+
+            user = User.objects.get(username=username, email=email)
+            candidate_profile = CandidateProfile.objects.get(user=user)
+            qualification = Qualification.objects.get(id=qualification_id, candidate=candidate_profile)
+
+            qualification.delete()
+
+            return JsonResponse({'message': 'Qualification deleted successfully'}, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        except CandidateProfile.DoesNotExist:
+            return JsonResponse({'error': 'Candidate profile not found'}, status=404)
+        except Qualification.DoesNotExist:
+            return JsonResponse({'error': 'Qualification not found'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=400)
+
+
+@api_view(['GET'])
+def getQualifications(request):
+    email = request.GET.get('email')
+    username = request.GET.get('username')
+
+    try:
+        user = User.objects.get(username=username, email=email)
+        candidate_profile = CandidateProfile.objects.get(user=user)
+        qualifications = Qualification.objects.filter(candidate=candidate_profile)
+
+        qualification_list = [
+            {
+                'id': qualification.id,
+                'school': qualification.school,
+                'qualification': qualification.qualification,
+                'start_year': qualification.start_year,
+                'end_year': qualification.end_year,
+            }
+            for qualification in qualifications
+        ]
+
+        return JsonResponse(qualification_list, safe=False)
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
     except CandidateProfile.DoesNotExist:

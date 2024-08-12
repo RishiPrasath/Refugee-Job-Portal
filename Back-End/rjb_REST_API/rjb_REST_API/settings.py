@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',  # Move daphne to the top
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'channels',
     'rjb',
     'corsheaders',
+    'channels_redis',
 ]
 
 MIDDLEWARE = [
@@ -127,17 +129,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
-ASGI_APPLICATION = 'rjb_REST_API.asgi.application'
-CHANNEL_LAYERS = {
-  'default': {
-    'BACKEND': 'channels_redis.core.RedisChannelLayer',
-    'CONFIG': {
-      "hosts": [('127.0.0.1', 6379)],
-    },
-  },
-}
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
@@ -148,3 +139,11 @@ AUTH_USER_MODEL = 'rjb.User'
 # Media files (uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'fileUploads'
+
+ASGI_APPLICATION = 'rjb_REST_API.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}

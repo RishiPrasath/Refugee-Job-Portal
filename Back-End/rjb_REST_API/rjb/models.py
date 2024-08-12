@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import os
 # User model to manage user accounts, including authentication details and roles.
 class User(AbstractUser):
     # Role of the user (e.g., candidate, employer, admin)
@@ -22,14 +22,12 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
-# New Qualification model
 class Qualification(models.Model):
     school = models.CharField(max_length=255)
     qualification = models.CharField(max_length=255)
     start_year = models.IntegerField()
     end_year = models.IntegerField()
     candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
-
 
 class WorkExperience(models.Model):
     # Name of the company where the experience was gained
@@ -50,8 +48,6 @@ class WorkExperience(models.Model):
 def candidate_profile_picture_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/profile_pictures/<user_id>_<candidate_id>/<filename>
     return f'profile_pictures/{instance.user.id}_{instance.id}/{filename}'
-
-
 
 # Candidate profile model to store comprehensive user profiles detailing personal, contact, and professional information.
 class CandidateProfile(models.Model):
@@ -89,7 +85,6 @@ class CandidateProfile(models.Model):
 def employer_logo_directory_path(instance, filename):
     # file will be uploaded to MEDIA_ROOT/logos/<user_id>_<employer_id>/<filename>
     return f'logos/{instance.user.id}_{instance.id}/{filename}'
-
 
 # Employer profile model to store comprehensive employer profiles detailing contact, company, and operational information.
 class EmployerProfile(models.Model):
@@ -244,9 +239,6 @@ class CandidateSavesJobPosting(models.Model):
 
     class Meta:
         unique_together = ('candidate', 'job_posting')
-
-# New JobOffer model
-import os
 
 def job_offer_document_directory_path(instance, filename):
     # Generate the new file name based on the application, job posting, and candidate profile IDs

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, Typography, Grid, Box } from '@mui/material';
+import { Card, CardContent, Typography, Grid, Box, Avatar } from '@mui/material';
 import { useGlobalState } from '../../../globalState/globalState';
 import EmailIcon from '@mui/icons-material/Email';
-import PersonIcon from '@mui/icons-material/Person';
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
 import InfoIcon from '@mui/icons-material/Info';
 import { useNavigate } from 'react-router-dom';
@@ -12,6 +11,7 @@ type Candidate = {
   email: string;
   immigration_status: string;
   accessibility_requirements: string;
+  profile_picture: string | null;
 };
 
 const CandidateCard: React.FC<{ candidate: Candidate }> = ({ candidate }) => {
@@ -23,10 +23,14 @@ const CandidateCard: React.FC<{ candidate: Candidate }> = ({ candidate }) => {
 
   return (
     <Grid item xs={12} sm={6} md={4} onClick={handleClick} style={{ cursor: 'pointer' }}>
-      <Card elevation={3} style={{ borderRadius: '8px' }}>
+      <Card elevation={3} style={{ borderRadius: '8px', height: '100%' }}>
         <CardContent>
           <Box display="flex" alignItems="center" mb={2}>
-            <PersonIcon style={{ marginRight: '0.75rem' }} />
+            <Avatar
+              alt={candidate.full_name}
+              src={candidate.profile_picture || undefined}
+              sx={{ width: 40, height: 40, marginRight: '0.75rem' }}
+            />
             <Typography variant="h6" style={{ fontWeight: 'bold' }}>{candidate.full_name}</Typography>
           </Box>
           <Box display="flex" alignItems="center" mb={2}>
@@ -59,6 +63,7 @@ const ViewCandidates: React.FC = () => {
         const response = await fetch(url);
         const data = await response.json();
         if (response.ok) {
+          console.log("Assigned Candidates: ",data);
           setCandidates(data.candidates);
         } else {
           console.error('Error fetching candidates:', data.error);

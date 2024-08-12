@@ -44,6 +44,14 @@ const UpcomingInterviews: React.FC = () => {
       )}
       <CardContent>
         <Box display="flex" flexDirection="column" gap={2}>
+          <Typography variant="h6" gutterBottom fontWeight="bold">
+            {interview.interview_type.toUpperCase()} INTERVIEW
+          </Typography>
+          <Box display="flex" alignItems="center" mb={1}>
+            <WorkIcon sx={{ mr: 1 }} />
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Job Title:</Typography>
+            <Typography variant="body2" sx={{ wordWrap: 'break-word' }}>{interview.job_title}</Typography>
+          </Box>
           <Box display="flex" flexDirection="column">
             <Box display="flex" alignItems="center">
               <BusinessIcon sx={{ mr: 1 }} />
@@ -58,17 +66,7 @@ const UpcomingInterviews: React.FC = () => {
             </Box>
             <Typography variant="body2" sx={{ ml: 4 }}>{interview.company_email}</Typography>
           </Box>
-          <Typography variant="h6" gutterBottom fontWeight="bold">
-            {interview.interview_type.toUpperCase()} INTERVIEW
-          </Typography>
           <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Box display="flex" alignItems="center" mb={1}>
-                <WorkIcon sx={{ mr: 1 }} />
-                <Typography variant="subtitle1" sx={{ fontWeight: 'bold', mr: 1 }}>Job Title:</Typography>
-                <Typography variant="body2" sx={{ wordWrap: 'break-word' }}>{interview.job_title}</Typography>
-              </Box>
-            </Grid>
             <Grid item xs={12}>
               <Box display="flex" alignItems="center" mb={1}>
                 <EventIcon sx={{ mr: 1 }} />

@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import home, searchJobPostings, viewJobDetails, getCandidateProfile, saveJob, getSavedJobs, removeSavedJob, submitJobApplication, getAppliedJobs, withdrawApplication, getCandidateUpcomingInterviews, getCandidateJobOffers, approveJobOffer, rejectJobOffer, getCandidateApplications
+from .views import *
 
 urlpatterns = [
     path('', home, name='candidate-home'),
@@ -17,4 +17,15 @@ urlpatterns = [
     path('approveJobOffer/<int:job_offer_id>/', approveJobOffer, name='approveJobOffer'),
     path('rejectJobOffer/<int:job_offer_id>/', rejectJobOffer, name='rejectJobOffer'),
     path('getCandidateApplications', getCandidateApplications, name='getCandidateApplications'),
+    path('updateProfile', updateProfile, name='updateProfile'),
+    path('updateSkills', updateSkills, name='updateSkills'),
+    path('updateQualifications', updateQualifications, name='updateQualifications'),
+    path('updateWorkExperiences', updateWorkExperiences, name='updateWorkExperiences'),
+    path('addWorkExperience', addWorkExperience, name='addWorkExperience'),
+    path('deleteWorkExperience', deleteWorkExperience, name='deleteWorkExperience'),
+    path('addQualification', addQualification, name='addQualification'),
+    path('updateQualification', updateQualification, name='updateQualification'),
+    path('deleteQualification', deleteQualification, name='deleteQualification'),
+    path('skills', getAllSkills, name='getAllSkills'),
+    path('getQualifications', getQualifications, name='getQualifications'),
 ]

@@ -11,7 +11,7 @@ from django.http import FileResponse
 import os
 from django.shortcuts import get_object_or_404
 
-
+# Home view for the employer portal
 @api_view(['GET'])
 def home(request):
     data = {
@@ -20,6 +20,7 @@ def home(request):
     }
     return Response(data)
 
+# View to add a new job posting
 @api_view(['POST'])
 def addJobPosting(request):
     try:
@@ -61,6 +62,7 @@ def addJobPosting(request):
         print("Error in addJobPosting:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
+# View to get all job postings for an employer
 @api_view(['GET'])
 def getJobPostings(request):
     username = request.query_params.get('username')
@@ -77,6 +79,7 @@ def getJobPostings(request):
     except EmployerProfile.DoesNotExist:
         return Response({"error": "Employer not found"}, status=404)
 
+# View to get details of a specific job posting
 @api_view(['GET'])
 def getJobDetails(request, job_id, username):
     try:
@@ -142,6 +145,7 @@ def getJobDetails(request, job_id, username):
         print("Error in getJobDetails:", str(e))
         return Response({"error": str(e)}, status=500)
 
+# View to get details of a specific candidate application
 @api_view(['GET'])
 def getCandidateApplicationDetails(request, application_id):
     try:
@@ -149,8 +153,7 @@ def getCandidateApplicationDetails(request, application_id):
         application = Application.objects.get(id=application_id)
         candidate_profile = application.applicant.candidateprofile
 
-
-        #pritn file name of cv
+        # Print file name of CV
         print("CV file name:", application.cv.name)
 
         profile_picture = None
@@ -200,6 +203,7 @@ def getCandidateApplicationDetails(request, application_id):
         print("Error in getCandidateApplicationDetails:", str(e))
         return Response({"error": str(e)}, status=500)
 
+# View to create a new interview
 @api_view(['POST'])
 def createInterview(request):
     try:
@@ -233,6 +237,7 @@ def createInterview(request):
         print("Error in createInterview:", str(e))  # Debug print to check the error
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
+# View to get interviews by status
 @api_view(['GET'])
 def getInterviewsByStatus(request):
     application_id = request.query_params.get('application_id')
@@ -257,6 +262,7 @@ def getInterviewsByStatus(request):
         print("Error in getInterviewsByStatus:", str(e))
         return Response({"error": str(e)}, status=500)
 
+# View to update an existing interview
 @api_view(['POST'])
 def updateInterview(request):
     try:
@@ -297,6 +303,7 @@ def updateInterview(request):
         print("Error in updateInterview:", str(e))  # Debug print to check the error
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
+# View to cancel an interview
 @api_view(['POST'])
 def cancelInterview(request):
     try:
@@ -323,6 +330,7 @@ def cancelInterview(request):
         print("Error in cancelInterview:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
+# View to close an interview
 @api_view(['POST'])
 def closeInterview(request):
     try:
@@ -352,7 +360,8 @@ def closeInterview(request):
     except Exception as e:
         print("Error in closeInterview:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
-    
+
+# View to get upcoming interviews
 @api_view(['GET'])
 def getUpcomingInterviews(request):
     company_name = request.query_params.get('company_name')
@@ -420,6 +429,7 @@ def getUpcomingInterviews(request):
         print("Error in getUpcomingInterviews:", str(e))
         return Response({"error": str(e)}, status=500)
 
+# View to get job offer details for a specific application
 @api_view(['GET'])
 def getJobOffer(request, application_id):
     try:
@@ -437,9 +447,8 @@ def getJobOffer(request, application_id):
             return Response({"message": "No job offer associated with this application"}, status=200)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
-    
 
-
+# View to create a new job offer
 @api_view(['POST'])
 def createJobOffer(request):
     try:
@@ -477,8 +486,8 @@ def createJobOffer(request):
     except Exception as e:
         print("Error in createJobOffer:", str(e))  # Debug print to check the error
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
-    
 
+# View to update an existing job offer
 @api_view(['POST'])
 def updateJobOffer(request):
     try:
@@ -525,6 +534,7 @@ def updateJobOffer(request):
         print("Error in updateJobOffer:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
+# View to reject a candidate application
 @api_view(['POST'])
 def rejectApplication(request):
     try:
@@ -545,3 +555,65 @@ def rejectApplication(request):
     except Exception as e:
         print("Error in rejectApplication:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
+
+# View to get employer profile
+@api_view(['GET'])
+def getProfile(request):
+    try:
+        username = request.query_params.get('username')
+        email = request.query_params.get('email')
+        if not username or not email:
+            return Response({"error": "Username and email are required"}, status=400)
+
+        user = User.objects.get(username=username, email=email)
+        employer_profile = EmployerProfile.objects.get(user=user)
+
+        profile_data = {
+            "username": user.username,
+            "email": user.email,
+            "role": user.role,
+            "company_name": employer_profile.company_name,
+            "industry": employer_profile.industry,
+            "contact_phone": employer_profile.contact_phone,
+            "location": employer_profile.location,
+            "website_url": employer_profile.website_url,
+            "logo": request.build_absolute_uri(employer_profile.logo.url) if employer_profile.logo else None,
+            "description": employer_profile.description,
+            "is_active": employer_profile.is_active,
+        }
+
+        return Response(profile_data, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except EmployerProfile.DoesNotExist:
+        return Response({"error": "Employer profile not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+
+@api_view(['POST'])
+@csrf_exempt
+def updateProfile(request):
+    try:
+        username = request.data.get('username')
+        email = request.data.get('email')
+        
+        if not username or not email:
+            return Response({"error": "Username and email are required"}, status=400)
+
+        user = get_object_or_404(User, username=username, email=email)
+        employer_profile = get_object_or_404(EmployerProfile, user=user)
+
+        # Update fields
+        employer_profile.company_name = request.data.get('company_name', employer_profile.company_name)
+        employer_profile.industry = request.data.get('industry', employer_profile.industry)
+        employer_profile.contact_phone = request.data.get('contact_phone', employer_profile.contact_phone)
+        employer_profile.location = request.data.get('location', employer_profile.location)
+        employer_profile.website_url = request.data.get('website_url', employer_profile.website_url)
+        employer_profile.description = request.data.get('description', employer_profile.description)
+
+        employer_profile.save()
+
+        return Response({"message": "Profile updated successfully"}, status=200)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)

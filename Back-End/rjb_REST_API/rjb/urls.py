@@ -9,4 +9,5 @@ urlpatterns = [
     path('coordinators/', include('rjb.coordinators.urls')),
     path('employers/', include('rjb.employers.urls')),
     path('auth/', include('rjb.auth.urls')),  # Add this line
+    path('livereload/', include('livereload.urls')),  # Add this line
 ]

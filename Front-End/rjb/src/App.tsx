@@ -20,6 +20,7 @@ import CandidateUpcomingInterviews from './components/roles/Candidate/UpcomingIn
 import JobOfferForm from './components/roles/Employer/JobOfferForm';
 import CandidateJobOffers from './components/roles/Candidate/CandidateJobOffers';
 import ApplicationStatus from './components/roles/Candidate/ApplicationStatus';
+import ProfileManagement from './components/roles/Employer/ProfileManagement';
 import { GlobalStateProvider } from './globalState/globalState';
 import './App.css';
 
@@ -43,12 +44,12 @@ const App = () => {
                     <Route path="/candidate-job-view/:company/:jobId" element={<CandidateJobPosting />} />
                     <Route path="/profile" element={<CandidateProfile />} />
                     <Route path="/applyForJob/:company/:jobTitle/:jobId" element={<ApplyForJob />} />
-                    <Route path="/candidateProfile" element={<CandidateProfile />} />
                     <Route path="/upcoming-interviews" element={<UpcomingInterviews />} />
                     <Route path="/candidate-upcoming-interviews" element={<CandidateUpcomingInterviews />} />
                     <Route path="/joboffer/:applicationId" element={<JobOfferForm />} />
                     <Route path="/candidate-job-offers" element={<CandidateJobOffers />} />
                     <Route path="/job-applications" element={<ApplicationStatus />} />
+                    <Route path="/employer-profile" element={<ProfileManagement />} />
                 </Routes>
             </Router>
         </GlobalStateProvider>
