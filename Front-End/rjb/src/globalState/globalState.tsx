@@ -13,6 +13,7 @@ interface GlobalStateContextType {
   full_name: string;
   company_name: string;
   assigned_case_worker: string;
+  userID: string; // Add userID here
   setLoggedIn: (loggedIn: boolean) => void;
   setUserType: (userType: string) => void;
   setUsername: (username: string) => void;
@@ -25,6 +26,7 @@ interface GlobalStateContextType {
   setFullName: (full_name: string) => void;
   setCompanyName: (company_name: string) => void;
   setAssignedCaseWorker: (assigned_case_worker: string) => void;
+  setUserID: (userID: string) => void; // Add setter for userID
   availableSkills: string[];
 }
 
@@ -43,6 +45,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
   const [full_name, setFullName] = useState<string>(() => localStorage.getItem('full_name') || '');
   const [company_name, setCompanyName] = useState<string>(() => localStorage.getItem('company_name') || '');
   const [assigned_case_worker, setAssignedCaseWorker] = useState<string>(() => localStorage.getItem('assigned_case_worker') || '');
+  const [userID, setUserID] = useState<string>(() => localStorage.getItem('userID') || ''); // Initialize userID
 
   useEffect(() => {
     localStorage.setItem('loggedIn', JSON.stringify(loggedIn));
@@ -100,6 +103,10 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
     }
   }, [company_logo]);
 
+  useEffect(() => {
+    localStorage.setItem('userID', userID);
+  }, [userID]);
+
   const availableSkills: string[] = [
     'JavaScript', 'React', 'Node.js', 'Python', 'Django', 'Flask', 'SQL', 'NoSQL', 'HTML', 'CSS',
     // ... other skills
@@ -119,6 +126,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       full_name,
       company_name,
       assigned_case_worker,
+      userID,
       setLoggedIn,
       setUserType,
       setUsername,
@@ -131,6 +139,7 @@ export const GlobalStateProvider: React.FC<{ children: ReactNode }> = ({ childre
       setFullName,
       setCompanyName,
       setAssignedCaseWorker,
+      setUserID,
       availableSkills
     }}>
       {children}

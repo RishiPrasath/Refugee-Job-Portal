@@ -39,9 +39,14 @@ const JobOfferForm: React.FC = () => {
     formData.append('jobOfferDocument', jobOfferDocument);
 
     try {
-      const response = await fetch('http://localhost:8000/employers/createJobOffer/', { // Added trailing slash
+      const csrfToken = getCookie('csrftoken');
+      const response = await fetch('http://localhost:8000/employers/createJobOffer/', {
         method: 'POST',
         body: formData,
+        credentials: 'include', // Ensure cookies are sent with the request
+        headers: {
+          'X-CSRFToken': csrfToken || '', // Ensure the token is a string
+        },
       });
       const data = await response.json();
       if (response.ok) {
@@ -53,6 +58,22 @@ const JobOfferForm: React.FC = () => {
     } catch (error) {
       console.error('Error submitting job offer:', error);
     }
+  };
+
+  // Function to get CSRF token from cookies
+  const getCookie = (name: string) => {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
   };
 
   return (

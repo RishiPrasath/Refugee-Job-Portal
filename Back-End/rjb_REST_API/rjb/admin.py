@@ -15,7 +15,8 @@ from .models import (
     HiringCoordinatorProfile, 
     CaseWorkerProfile,
     CandidateSavesJobPosting,
-    JobOffer
+    JobOffer,
+    Event
 )
 
 class HiringCoordinatorProfileAdmin(admin.ModelAdmin):
@@ -125,3 +126,4 @@ admin.site.register(Notification)
 admin.site.register(Message)
 admin.site.register(CandidateSavesJobPosting, CandidateSavesJobPostingAdmin)
 admin.site.register(JobOffer, JobOfferAdmin)
+admin.site.register(Event)

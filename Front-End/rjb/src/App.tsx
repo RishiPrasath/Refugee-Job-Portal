@@ -21,6 +21,12 @@ import JobOfferForm from './components/roles/Employer/JobOfferForm';
 import CandidateJobOffers from './components/roles/Candidate/CandidateJobOffers';
 import ApplicationStatus from './components/roles/Candidate/ApplicationStatus';
 import ProfileManagement from './components/roles/Employer/ProfileManagement';
+import CandidateView from './components/roles/HiringCoordinator/CandidateView';
+import JobPostingView from './components/roles/HiringCoordinator/JobPostingView';
+import JobApplicationView from './components/roles/HiringCoordinator/JobApplicationView';
+import EmployerView from './components/roles/HiringCoordinator/EmployerView';
+import CreateCandidate from './components/roles/CaseWorker/createCandidate';
+import Search from './components/roles/HiringCoordinator/Search';
 import { GlobalStateProvider } from './globalState/globalState';
 import './App.css';
 
@@ -50,6 +56,12 @@ const App = () => {
                     <Route path="/candidate-job-offers" element={<CandidateJobOffers />} />
                     <Route path="/job-applications" element={<ApplicationStatus />} />
                     <Route path="/employer-profile" element={<ProfileManagement />} />
+                    <Route path="/candidate-view/:candidateId" element={<CandidateView />} />
+                    <Route path="/jobposting-view/:jobId" element={<JobPostingView />} />
+                    <Route path="/jobapplication-view/:applicationId" element={<JobApplicationView />} />
+                    <Route path="/employer-view/:employerId" element={<EmployerView />} />
+                    <Route path="/create-candidate" element={<CreateCandidate />} />
+                    <Route path="/hiring-coordinator-search" element={<Search />} />
                 </Routes>
             </Router>
         </GlobalStateProvider>

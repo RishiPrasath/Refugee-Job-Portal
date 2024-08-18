@@ -12,6 +12,8 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from rjb.models import *
 import base64
+from rjb.notifications.signals import create_candidate
+
 
 @csrf_exempt
 def login(request):
@@ -102,7 +104,6 @@ def register(request):
     }
     return Response(data)
 
-@csrf_exempt
 def register_candidate(request):
     if request.method == 'POST':
         try:
@@ -210,6 +211,9 @@ def register_candidate(request):
                             skill, created = Skill.objects.get_or_create(skill_name=skill_name.strip())
                             work_exp.skills.add(skill)
 
+            # Trigger the create_candidate signal
+            create_candidate.send(sender=candidate_profile.__class__, candidate_profile=candidate_profile, profile_picture_url=request.build_absolute_uri(candidate_profile.profile_picture.url))
+
             print("Assigned case worker: ", case_worker.full_name)
 
             return JsonResponse({'message': 'Candidate registration successful', 'data': data})
@@ -217,7 +221,6 @@ def register_candidate(request):
             print("Exception occurred:", str(e))
             print(traceback.format_exc())  # Print the full traceback for debugging
             return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
-
 @csrf_exempt
 def register_employer(request):
     if request.method == 'POST':

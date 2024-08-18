@@ -1,3 +1,4 @@
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.http import JsonResponse
@@ -14,6 +15,11 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
 import json
 from django.views.decorators.csrf import csrf_exempt
+from rjb.notifications.signals import apply_for_job
+from rjb.notifications.signals import approve_job_offer
+from rjb.notifications.signals import reject_job_offer
+from rjb.notifications.signals import candidate_profile_update
+
 
 @api_view(['GET'])
 def home(request):
@@ -251,6 +257,12 @@ def submitJobApplication(request):
             status='Submitted'
         )
 
+        # Get candidate profile picture URL
+        candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+
+        # Trigger the apply_for_job signal
+        apply_for_job.send(sender=submitJobApplication, application=application, candidate_profile_picture_url=candidate_profile_picture_url)
+
         return JsonResponse({'message': 'Application submitted successfully.'}, status=201)
     except User.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
@@ -331,7 +343,6 @@ def withdrawApplication(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-
 @api_view(['GET'])
 def getCandidateUpcomingInterviews(request):
     email = request.GET.get('email')
@@ -397,7 +408,6 @@ def getCandidateUpcomingInterviews(request):
     except CandidateProfile.DoesNotExist:
         return JsonResponse({'error': 'Candidate profile not found'}, status=404)
 
-
 @api_view(['GET'])
 def getCandidateJobOffers(request):
     username = request.GET.get('username')
@@ -447,6 +457,17 @@ def approveJobOffer(request, job_offer_id):
         job_offer = JobOffer.objects.get(id=job_offer_id)
         job_offer.status = 'Approved'
         job_offer.save()
+
+        # Get the absolute path of the candidate's profile picture
+        candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url)
+
+        # Trigger the signal
+        approve_job_offer.send(
+            sender=approveJobOffer.__class__,
+            job_offer=job_offer,
+            candidate_profile_picture=candidate_profile_picture_path
+        )
+
         return JsonResponse({'message': 'Job offer approved successfully'}, status=200)
     except JobOffer.DoesNotExist:
         return JsonResponse({'error': 'Job offer not found'}, status=404)
@@ -459,12 +480,22 @@ def rejectJobOffer(request, job_offer_id):
         job_offer = JobOffer.objects.get(id=job_offer_id)
         job_offer.status = 'Rejected'
         job_offer.save()
+
+        # Get the absolute path of the candidate's profile picture
+        candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url)
+
+        # Trigger the signal
+        reject_job_offer.send(
+            sender=rejectJobOffer.__class__,
+            job_offer=job_offer,
+            candidate_profile_picture=candidate_profile_picture_path
+        )
+
         return JsonResponse({'message': 'Job offer rejected successfully'}, status=200)
     except JobOffer.DoesNotExist:
         return JsonResponse({'error': 'Job offer not found'}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-
 
 @api_view(['GET'])
 def getCandidateApplications(request):
@@ -537,6 +568,14 @@ def updateProfile(request):
 
             candidate_profile.save()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=updateProfile.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             return JsonResponse({'message': 'Profile updated successfully'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -587,6 +626,14 @@ def updateSkills(request):
         skill_names = [skill.skill_name for skill in skill_objects]
         print("Candidate's new skills: ", skill_names)
 
+        # Trigger the signal
+        candidate_profile_picture_url = request.build_absolute_uri(candidate.profile_picture.url) if candidate.profile_picture else None
+        candidate_profile_update.send(
+            sender=updateSkills.__class__,
+            candidate_profile_picture_url=candidate_profile_picture_url,
+            candidate=candidate
+        )
+
         return JsonResponse({'message': 'Skills updated successfully'}, status=200)
 
     except User.DoesNotExist:
@@ -632,6 +679,14 @@ def updateWorkExperiences(request):
             work_experience.description = updated_experience['description']
             work_experience.save()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=updateWorkExperiences.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             return JsonResponse({'message': 'Work experience updated successfully'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -644,15 +699,11 @@ def updateWorkExperiences(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
 
-
-
-
 @api_view(['GET'])
 def getAllSkills(request):
     skills = Skill.objects.all()
     skill_list = [{'id': skill.id, 'skill_name': skill.skill_name} for skill in skills]
     return JsonResponse(skill_list, safe=False)
-
 
 @csrf_exempt
 def addWorkExperience(request):
@@ -676,6 +727,14 @@ def addWorkExperience(request):
             )
             work_experience.save()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=addWorkExperience.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             return JsonResponse({'message': 'Work experience added successfully'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -685,8 +744,6 @@ def addWorkExperience(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
-
-
 
 @csrf_exempt
 def deleteWorkExperience(request):
@@ -703,6 +760,14 @@ def deleteWorkExperience(request):
 
             work_experience.delete()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=deleteWorkExperience.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             return JsonResponse({'message': 'Work experience deleted successfully'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -715,9 +780,6 @@ def deleteWorkExperience(request):
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
     
-
-
-
 @csrf_exempt
 def addQualification(request):
     if request.method == 'POST':
@@ -744,8 +806,13 @@ def addQualification(request):
             #print the qualification data
             print("Qualification data: ", qualification.school, qualification.qualification, qualification.start_year, qualification.end_year)
 
-
-
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=addQualification.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
 
             # Return the newly created qualification
             return JsonResponse({
@@ -785,6 +852,14 @@ def updateQualification(request):
             qualification.end_year = updated_qualification['end_year']
             qualification.save()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=updateQualification.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             # Return the updated qualification data
             return JsonResponse({
                 'id': qualification.id,
@@ -820,6 +895,14 @@ def deleteQualification(request):
 
             qualification.delete()
 
+            # Trigger the signal
+            candidate_profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None
+            candidate_profile_update.send(
+                sender=deleteQualification.__class__,
+                candidate_profile_picture_url=candidate_profile_picture_url,
+                candidate=candidate_profile
+            )
+
             return JsonResponse({'message': 'Qualification deleted successfully'}, status=200)
         except User.DoesNotExist:
             return JsonResponse({'error': 'User not found'}, status=404)
@@ -831,7 +914,6 @@ def deleteQualification(request):
             return JsonResponse({'error': str(e)}, status=500)
     else:
         return JsonResponse({'error': 'Invalid request method'}, status=400)
-
 
 @api_view(['GET'])
 def getQualifications(request):

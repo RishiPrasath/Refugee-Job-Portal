@@ -4,47 +4,34 @@ import NotificationCard from './NotificationCard';
 
 type Notification = {
   id: number;
-  title: string;
-  message: string;
-  date: string;
+  description: string;
+  recipient: number;
+  owner: number;
+  routetopage: string;
+  created_at: string;
+  notification_image: string; // This will now be a URL
 };
 
-const dummyNotifications: Notification[] = [
-  {
-    id: 1,
-    title: 'New Job Posting',
-    message: 'A new job posting has been added to your preferred category.',
-    date: '2023-10-01',
-  },
-  {
-    id: 2,
-    title: 'Interview Scheduled',
-    message: 'Your interview for the Software Engineer position has been scheduled.',
-    date: '2023-10-02',
-  },
-  {
-    id: 3,
-    title: 'Profile Update',
-    message: 'Your profile has been successfully updated.',
-    date: '2023-10-03',
-  },
-];
+type NotificationListProps = {
+  notifications: Notification[];
+  onClose: () => void;
+};
 
-const NotificationList: React.FC = () => {
+const NotificationList: React.FC<NotificationListProps> = ({ notifications, onClose }) => {
   return (
     <Box>
-      {dummyNotifications.map((notification) => (
+      {notifications.map((notification) => (
         <NotificationCard
           key={notification.id}
-          title={notification.title}
-          message={notification.message}
-          date={notification.date}
+          description={notification.description}
+          created_at={notification.created_at}
+          notification_image={notification.notification_image} // Pass URL image
+          routetopage={notification.routetopage}
+          onClose={onClose} // Pass onClose callback
         />
       ))}
     </Box>
   );
 };
-
-export const notificationCount = dummyNotifications.length;
 
 export default NotificationList;

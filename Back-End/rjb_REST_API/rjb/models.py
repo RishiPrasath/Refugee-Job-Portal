@@ -209,14 +209,8 @@ class Interview(models.Model):
     # Feedback from the interview
     feedback = models.TextField(null=True, blank=True)
 
-# Notifications model to store notifications for users, including details on whether they have been read.
-class Notification(models.Model):
-    # Foreign key linking to the User model
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # Notification message
-    message = models.TextField()
-    # Indicates if the notification has been read
-    read_status = models.BooleanField(default=False)
+
+
 
 # Messages model to facilitate message exchanges between users, supporting direct communication within the platform.
 class Message(models.Model):
@@ -258,3 +252,21 @@ class JobOffer(models.Model):
 
     def __str__(self):
         return f"Job Offer for {self.job_posting.job_title} by {self.employer.company_name} to {self.candidate.full_name}"
+    
+class Notification(models.Model):
+    message = models.TextField()
+    recipient = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='owned_notifications', on_delete=models.CASCADE)
+    dismissed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    routetopage = models.CharField(max_length=255, null=True, blank=True)
+    def __str__(self):
+        return f"Notification for {self.owner.username} - {self.message[:20]}"
+    
+class Event(models.Model):
+    owner = models.ForeignKey(User, related_name='events', on_delete=models.CASCADE)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Event for {self.owner.username} - {self.description[:20]}"

@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 from django.views.decorators.csrf import csrf_exempt
 from rjb.models import EmployerProfile, JobPosting, Skill, JobRequiresSkill, Application, CandidateProfile, User, Qualification, WorkExperience, Interview, JobOffer
 from django.db.models import Q
@@ -10,6 +11,9 @@ from datetime import datetime, time
 from django.http import FileResponse
 import os
 from django.shortcuts import get_object_or_404
+from rjb.notifications.signals import *
+from django.http import HttpRequest
+from rjb.notifications.signals import create_interview  # Ensure this import is present
 
 # Home view for the employer portal
 @api_view(['GET'])
@@ -55,6 +59,12 @@ def addJobPosting(request):
         for skill_name in data['skills']:
             skill, created = Skill.objects.get_or_create(skill_name=skill_name)
             JobRequiresSkill.objects.create(job=job_posting, skill=skill)
+
+        # Construct the URL for the company logo
+        company_logo_url = request.build_absolute_uri(employer.logo.url) if employer.logo else None
+
+        # Trigger the create_job_posting signal and pass the logo URL
+        create_job_posting.send(sender=addJobPosting, job_posting=job_posting, company_logo_url=company_logo_url)
 
         return Response({"message": "Job posting added successfully", "data": data})
 
@@ -205,7 +215,7 @@ def getCandidateApplicationDetails(request, application_id):
 
 # View to create a new interview
 @api_view(['POST'])
-def createInterview(request):
+def createInterview(request: HttpRequest):
     try:
         data = request.data
         print("Received data:", data)  # Debug print to check what data is received
@@ -231,8 +241,21 @@ def createInterview(request):
             status='Scheduled'
         )
         interview.save()
+        
+        # Fetch the candidate profile using the applicant (user) from the application
+        candidate = CandidateProfile.objects.get(user=application.applicant)
+
+        # Construct the URL for the company logo
+        company_logo_url = request.build_absolute_uri(application.job.employer.logo.url) if application.job.employer.logo else None
+
+        # Trigger the create_interview signal and pass the logo URL
+        create_interview.send(sender=createInterview, application=application, candidate=candidate, company_logo_url=company_logo_url)
+        
+        print("Signal sent")
 
         return Response({"message": "Interview created successfully", "interview": interview.id}, status=201)
+    except CandidateProfile.DoesNotExist:
+        return Response({"message": "Candidate profile not found for the applicant"}, status=404)
     except Exception as e:
         print("Error in createInterview:", str(e))  # Debug print to check the error
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
@@ -325,7 +348,18 @@ def cancelInterview(request):
         application.status = 'Interview Cancelled'
         application.save()
 
+        # Fetch the candidate profile using the applicant (user) from the application
+        candidate = CandidateProfile.objects.get(user=application.applicant)
+
+        # Construct the URL for the company logo
+        company_logo_url = request.build_absolute_uri(application.job.employer.logo.url) if application.job.employer.logo else None
+
+        # Trigger the cancel_interview signal and pass the logo URL
+        cancel_interview.send(sender=cancelInterview, application=application, candidate=candidate, company_logo_url=company_logo_url)
+
         return Response({"message": "Interview cancelled successfully", "interview": interview.id}, status=200)
+    except CandidateProfile.DoesNotExist:
+        return Response({"message": "Candidate profile not found for the applicant"}, status=404)
     except Exception as e:
         print("Error in cancelInterview:", str(e))
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
@@ -452,9 +486,13 @@ def getJobOffer(request, application_id):
 @api_view(['POST'])
 def createJobOffer(request):
     try:
-        application_id = request.POST.get('applicationId')
-        additional_details = request.POST.get('additionalDetails')
+        application_id = request.data.get('applicationId')
+        additional_details = request.data.get('additionalDetails')
         job_offer_document = request.FILES.get('jobOfferDocument')
+
+        print('OK')
+
+
 
         print("Application ID:", application_id)
         print("Additional details:", additional_details)
@@ -482,10 +520,13 @@ def createJobOffer(request):
         application.status = 'Approved'
         application.save()
 
-        return Response({"message": "Job offer created successfully", "job_offer": job_offer.id}, status=201)
+        # Trigger the signal
+        create_job_offer.send(sender=createJobOffer.__class__, job_offer=job_offer)
+
+        return Response({"message": "Job offer created successfully", "job_offer": job_offer.id}, status=status.HTTP_201_CREATED)
     except Exception as e:
         print("Error in createJobOffer:", str(e))  # Debug print to check the error
-        return Response({"message": "An error occurred", "error": str(e)}, status=500)
+        return Response({"message": "An error occurred", "error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # View to update an existing job offer
 @api_view(['POST'])
@@ -494,6 +535,8 @@ def updateJobOffer(request):
         job_offer_id = request.data.get('jobOfferId')
         additional_details = request.data.get('additionalDetails')
         job_offer_document = request.FILES.get('jobOfferDocument')
+
+       
 
         # Debugging
         print("Job offer ID:", job_offer_id)
@@ -551,6 +594,17 @@ def rejectApplication(request):
         application.status = 'Rejected'
         application.save()
 
+        # Get the absolute path of the employer's logo
+        employer_profile = application.job.employer
+        employer_logo_path = request.build_absolute_uri(employer_profile.logo.url) if employer_profile.logo else None
+
+        # Trigger the signal
+        reject_candidate.send(
+            sender=rejectApplication.__class__,
+            application=application,
+            employer_logo_path=employer_logo_path
+        )
+
         return Response({"message": "Application rejected successfully", "application": application.id}, status=200)
     except Exception as e:
         print("Error in rejectApplication:", str(e))
@@ -590,7 +644,6 @@ def getProfile(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
-
 @api_view(['POST'])
 @csrf_exempt
 def updateProfile(request):
@@ -613,6 +666,16 @@ def updateProfile(request):
         employer_profile.description = request.data.get('description', employer_profile.description)
 
         employer_profile.save()
+
+        # Get the absolute path of the employer's logo
+        employer_logo_path = request.build_absolute_uri(employer_profile.logo.url) if employer_profile.logo else None
+
+        # Trigger the signal
+        employer_profile_update.send(
+            sender=updateProfile.__class__,
+            employer_profile=employer_profile,
+            employer_logo_path=employer_logo_path
+        )
 
         return Response({"message": "Profile updated successfully"}, status=200)
     except Exception as e:

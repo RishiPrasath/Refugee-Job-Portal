@@ -20,6 +20,7 @@ interface Application {
   created_at: string;
 }
 
+
 interface ApplicationsProps {
   applications: Application[];
 }

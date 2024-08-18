@@ -69,7 +69,7 @@ const ApplyForJob: React.FC<Props> = () => {
       });
 
       if (response.ok) {
-        navigate('/candidateProfile');
+        navigate('/profile');
       } else {
         const data = await response.json();
         setFormError(data.error || 'Failed to submit application.');

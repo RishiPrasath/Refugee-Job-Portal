@@ -1,7 +1,8 @@
 from django.urls import path
-from . import views
+from rjb.advisors.views import *
 
 urlpatterns = [
-    path('getCandidateProfile', views.get_candidate_profile, name='get_candidate_profile'),
-    path('getAssignedCandidates', views.get_assigned_candidates, name='get_assigned_candidates'),
+    path('getCandidateProfile', get_candidate_profile, name='get_candidate_profile'),
+    path('getAssignedCandidates', get_assigned_candidates, name='get_assigned_candidates'),
+    path('createCandidate', create_candidate, name='create_candidate'),
 ]

@@ -17,18 +17,19 @@ const Login: React.FC = () => {
     setUserType, 
     setFullName, 
     setProfilePicture, 
-    setCompanyLogo, // Added this line
+    setCompanyLogo, 
     setSkills, 
     setAccessibilityRequirements, 
     setImmigrationStatus, 
     setCompanyName, 
     setAssignedCaseWorker,
+    setUserID, // Added setUserID here
     loggedIn, 
     userType, 
     username, 
     email: globalEmail, 
     profile_picture, 
-    company_logo, // Added this line
+    company_logo, 
     skills, 
     accessibility_requirements, 
     immigration_status, 
@@ -68,12 +69,13 @@ const Login: React.FC = () => {
         setUserType(data.role);
         setFullName(data.full_name);
         setProfilePicture(data.profile_picture);
-        setCompanyLogo(data.company_logo); // Added this line
+        setCompanyLogo(data.company_logo);
         setSkills(data.skills);
         setAccessibilityRequirements(data.accessibility_requirements);
         setImmigrationStatus(data.immigration_status);
         setCompanyName(data.company_name);
         setAssignedCaseWorker(data.assigned_case_worker);
+        setUserID(data.id); // Set userID here
 
         // Log global state variables
         console.log('Global State after login:', {
@@ -82,12 +84,13 @@ const Login: React.FC = () => {
           username,
           globalEmail,
           profile_picture,
-          company_logo, // Added this line
+          company_logo,
           skills,
           accessibility_requirements,
           immigration_status,
           full_name,
           company_name,
+          userID: data.id // Log userID
         });
 
         navigate('/home');
@@ -104,6 +107,10 @@ const Login: React.FC = () => {
       console.error('Error during login:', error);
       setEmailError('An error occurred during login.');
     }
+  };
+
+  const handleRegisterRedirect = () => {
+    navigate('/register');
   };
 
   return (
@@ -152,6 +159,14 @@ const Login: React.FC = () => {
             {passwordError}
           </Typography>
         )}
+        <Button
+          fullWidth
+          variant="outlined"
+          sx={{ mt: 1 }}
+          onClick={handleRegisterRedirect}
+        >
+          Register
+        </Button>
       </Box>
     </Box>
   );

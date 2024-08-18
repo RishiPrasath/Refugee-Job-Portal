@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Card, CardContent, Avatar } from '@mui/material';
 import { AccessTime, Event, LocationOn, Link, Info, CheckCircle, Feedback, Work, Business, Email } from '@mui/icons-material';
-
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 interface Interview {
   id: number;
   application_id: number;
@@ -32,7 +32,7 @@ const Interviews: React.FC<InterviewsProps> = ({ interviews }) => {
             <CardContent>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Typography variant="h6" style={{ marginTop: '10px', marginBottom: '10px' }}>
-                  {interview.interview_type.toUpperCase()} INTERVIEW
+                  {interview.interview_type ? interview.interview_type.toUpperCase() : 'INTERVIEW'}
                 </Typography>
                 <Avatar
                   alt="Company Logo"

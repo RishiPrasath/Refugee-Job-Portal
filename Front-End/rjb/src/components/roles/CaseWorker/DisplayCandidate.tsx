@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import SchoolIcon from '@mui/icons-material/School';
+import WorkIcon from '@mui/icons-material/Work';
+import EventNoteIcon from '@mui/icons-material/EventNote';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import DescriptionIcon from '@mui/icons-material/Description';
+import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CandidateProfile from './DisplayCandidate/CandidateProfile';
 import Qualifications from './DisplayCandidate/Qualifications';
 import WorkExperiences from './DisplayCandidate/WorkExperiences';
 import JobOffers from './DisplayCandidate/JobOffers';
 import Applications from './DisplayCandidate/Applications';
-import Interviews from './DisplayCandidate/Interviews'; // Import Interviews component
+import Interviews from './DisplayCandidate/Interviews';
+import Skills from './DisplayCandidate/Skills';
+import Events from './DisplayCandidate/Events';
 
 const DisplayCandidate: React.FC = () => {
   const { email } = useParams<{ email: string }>();
@@ -51,11 +61,67 @@ const DisplayCandidate: React.FC = () => {
     <div>
       <h1>Candidate Profile</h1>
       <CandidateProfile profile={data.candidate_profile} />
-      <Qualifications qualifications={data.qualifications} />
-      <WorkExperiences workExperiences={data.work_experiences} />
-      <JobOffers jobOffers={data.job_offers} />
-      <Applications applications={data.job_applications} />
-      <Interviews interviews={data.interviews} /> {/* Pass interviews data */}
+      {data.candidate_profile.skills && data.candidate_profile.skills.length > 0 && (
+        <Skills skills={data.candidate_profile.skills} />
+      )}
+      {data.events && data.events.length > 0 && (
+        <Events events={data.events} />
+      )}
+      {data.qualifications && data.qualifications.length > 0 && (
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <SchoolIcon style={{ marginRight: '8px' }} />
+            <Typography>Qualifications</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Qualifications qualifications={data.qualifications} />
+          </AccordionDetails>
+        </Accordion>
+      )}
+      {data.work_experiences && data.work_experiences.length > 0 && (
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <WorkIcon style={{ marginRight: '8px' }} />
+            <Typography>Work Experiences</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <WorkExperiences workExperiences={data.work_experiences} />
+          </AccordionDetails>
+        </Accordion>
+      )}
+      {data.job_offers && data.job_offers.length > 0 && (
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <CardMembershipIcon style={{ marginRight: '8px' }} />
+            <Typography>Job Offers</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <JobOffers jobOffers={data.job_offers} />
+          </AccordionDetails>
+        </Accordion>
+      )}
+      {data.job_applications && data.job_applications.length > 0 && (
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <DescriptionIcon style={{ marginRight: '8px' }} />
+            <Typography>Applications</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Applications applications={data.job_applications} />
+          </AccordionDetails>
+        </Accordion>
+      )}
+      {data.interviews && data.interviews.length > 0 && (
+        <Accordion>
+          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+            <CalendarTodayIcon style={{ marginRight: '8px' }} />
+            <Typography>Interviews</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <Interviews interviews={data.interviews} />
+          </AccordionDetails>
+        </Accordion>
+      )}
     </div>
   );
 };
