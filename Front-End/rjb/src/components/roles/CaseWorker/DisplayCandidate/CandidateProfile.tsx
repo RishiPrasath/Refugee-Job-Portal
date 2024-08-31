@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Grid, Avatar, Chip } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Avatar, Chip, Button } from '@mui/material';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import CakeIcon from '@mui/icons-material/Cake';
@@ -7,6 +7,9 @@ import ContactEmergencyIcon from '@mui/icons-material/ContactEmergency';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import InfoIcon from '@mui/icons-material/Info';
+import ChatIcon from '@mui/icons-material/Chat';
+import { useGlobalState } from '../../../../globalState/globalState';
+import { useNavigate } from 'react-router-dom';
 
 interface CandidateProfileProps {
   profile: {
@@ -26,6 +29,34 @@ interface CandidateProfileProps {
 }
 
 const CandidateProfile: React.FC<CandidateProfileProps> = ({ profile }) => {
+  const { userID } = useGlobalState();
+  const navigate = useNavigate();
+
+  const handleChatClick = async () => {
+    if (!profile) return;
+
+    try {
+      // Get candidate user ID
+      const response = await fetch(`http://localhost:8000/chats/get_user_id/${profile.email}/`);
+      if (!response.ok) {
+        throw new Error('Failed to get candidate user ID');
+      }
+      const { user_id: candidateUserID } = await response.json();
+
+      // Get or create chat group
+      const chatResponse = await fetch(`http://localhost:8000/chats/get_or_create_chat/${userID}/${candidateUserID}/`);
+      if (!chatResponse.ok) {
+        throw new Error('Failed to get or create chat group');
+      }
+      const { chat_group_id: chatGroupID } = await chatResponse.json();
+
+      // Navigate to chat page
+      navigate(`/chat/${chatGroupID}`);
+    } catch (error) {
+      console.error('Error initiating chat:', error);
+    }
+  };
+
   return (
     <Card>
       <CardContent>
@@ -70,6 +101,16 @@ const CandidateProfile: React.FC<CandidateProfileProps> = ({ profile }) => {
             </Box>
             <Typography variant="h6" mb={1}>Summary</Typography>
             <Typography variant="body1" mb={2}>{profile.summary}</Typography>
+            <Box display="flex" justifyContent="flex-start" mt={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleChatClick}
+                startIcon={<ChatIcon />}
+              >
+                Chat
+              </Button>
+            </Box>
           </Grid>
         </Grid>
       </CardContent>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Accordion, AccordionSummary, AccordionDetails, Box, Grid, Avatar, Typography, Chip } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Box, Grid, Avatar, Typography, Chip, Button } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -11,7 +11,10 @@ import SkillIcon from '@mui/icons-material/Build';
 import InfoIcon from '@mui/icons-material/Info';
 import SchoolIcon from '@mui/icons-material/School';
 import WorkIcon from '@mui/icons-material/Work';
+import ChatIcon from '@mui/icons-material/Chat';
 import InfoItem from './InfoItem';
+import { useGlobalState } from '../../../../globalState/globalState';
+import { useNavigate } from 'react-router-dom';
 
 interface CandidateProfile {
   full_name: string;
@@ -63,9 +66,36 @@ interface Application {
 
 const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ profile }) => {
   const [expanded, setExpanded] = useState(false);
+  const { userID } = useGlobalState();
+  const navigate = useNavigate();
 
   const handleChange = () => {
     setExpanded(!expanded);
+  };
+
+  const handleChatClick = async () => {
+    if (!profile) return;
+
+    try {
+      // Get candidate user ID
+      const response = await fetch(`http://localhost:8000/chats/get_user_id/${profile.email}/`);
+      if (!response.ok) {
+        throw new Error('Failed to get candidate user ID');
+      }
+      const { user_id: candidateUserID } = await response.json();
+
+      // Get or create chat group
+      const chatResponse = await fetch(`http://localhost:8000/chats/get_or_create_chat/${userID}/${candidateUserID}/`);
+      if (!chatResponse.ok) {
+        throw new Error('Failed to get or create chat group');
+      }
+      const { chat_group_id: chatGroupID } = await chatResponse.json();
+
+      // Navigate to chat page
+      navigate(`/chat/${chatGroupID}`);
+    } catch (error) {
+      console.error('Error initiating chat:', error);
+    }
   };
 
   return (
@@ -101,6 +131,16 @@ const CandidateProfileSection: React.FC<{ profile: CandidateProfile }> = ({ prof
           </Grid>
           <Grid item xs={12} sm={8}>
             <Typography variant="h5" mb={2}>{profile.full_name}</Typography>
+            <Box display="flex" justifyContent="flex-start" mb={2}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleChatClick}
+                startIcon={<ChatIcon />}
+              >
+                Chat
+              </Button>
+            </Box>
             <Box display="flex" flexDirection="column" gap={1}>
               <InfoItem icon={<EmailIcon />} label="Email" value={profile.email} />
               <InfoItem icon={<PhoneIcon />} label="Phone" value={profile.contact_phone} />

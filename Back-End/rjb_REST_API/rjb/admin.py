@@ -16,27 +16,30 @@ from .models import (
     CaseWorkerProfile,
     CandidateSavesJobPosting,
     JobOffer,
-    Event
+    Event,
+    ChatGroup
 )
+
+class ChatGroupAdmin(admin.ModelAdmin):
+    list_display = ('user1', 'user2')
+    search_fields = ('user1__username', 'user2__username')
+
+class MessageAdmin(admin.ModelAdmin):
+    list_display = ('chat_group', 'sender', 'timestamp')
+    search_fields = ('chat_group__id', 'sender__username')
+    list_filter = ('timestamp',)
 
 class HiringCoordinatorProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'full_name')
     search_fields = ('user__username', 'full_name')
 
-admin.site.register(HiringCoordinatorProfile, HiringCoordinatorProfileAdmin)
-
 class CaseWorkerProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'full_name')
     search_fields = ('user__username', 'full_name')
 
-admin.site.register(CaseWorkerProfile, CaseWorkerProfileAdmin)
-
-
 class SkillAdmin(admin.ModelAdmin):
     list_display = ('skill_name',)
     search_fields = ('skill_name',)
-
-admin.site.register(Skill, SkillAdmin)
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'role', 'is_active')
@@ -123,7 +126,13 @@ admin.site.register(JobRequiresSkill)
 admin.site.register(Application, ApplicationAdmin)
 admin.site.register(Interview)
 admin.site.register(Notification)
-admin.site.register(Message)
 admin.site.register(CandidateSavesJobPosting, CandidateSavesJobPostingAdmin)
 admin.site.register(JobOffer, JobOfferAdmin)
 admin.site.register(Event)
+
+# Check if ChatGroup and Message are already registered
+if not admin.site.is_registered(ChatGroup):
+    admin.site.register(ChatGroup, ChatGroupAdmin)
+
+if not admin.site.is_registered(Message):
+    admin.site.register(Message, MessageAdmin)

@@ -5,13 +5,15 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from rjb.models import *
 from rjb.models import Application
+from django.http import Http404
+
+from django.http import Http404
 
 @api_view(['GET'])
 def employer_view(request, employer_id):
     try:
-        # Retrieve the EmployerProfile object by ID
         employer_profile = get_object_or_404(EmployerProfile, id=employer_id)
-        user = employer_profile.user  # Get the associated user
+        user = employer_profile.user
         
         employer_data = {
             'company_name': employer_profile.company_name,
@@ -24,10 +26,7 @@ def employer_view(request, employer_id):
             'website_url': employer_profile.website_url,
         }
 
-        # Retrieve the job postings related to the employer
         job_postings = JobPosting.objects.filter(employer=employer_profile)
-
-        # Format the job postings data
         employer_data['job_postings'] = [
             {
                 'id': job_posting.id,
@@ -44,11 +43,7 @@ def employer_view(request, employer_id):
             } for job_posting in job_postings
         ]
 
-
-        # Retrieve the interviews related to the employer
         interviews = Interview.objects.filter(application__job__employer=employer_profile)
-
-        # Format the interview data
         employer_data['interviews'] = [
             {
                 'id': interview.id,
@@ -70,7 +65,6 @@ def employer_view(request, employer_id):
         ]
 
         events = Event.objects.filter(owner=user)
-
         employer_data['events'] = [
             {
                 'description': event.description,
@@ -78,17 +72,14 @@ def employer_view(request, employer_id):
             } for event in events
         ]
 
-
-
-
-        # Return the employer data
         return Response(employer_data, status=200)
 
-    except EmployerProfile.DoesNotExist:
+    except Http404:
         return Response({'error': 'Employer profile does not exist'}, status=404)
     except Exception as e:
         print(f"Error accessing employer_view: {e}")
         return Response({'error': str(e)}, status=500)
+
 
 @api_view(['GET'])
 def candidate_view(request, candidate_id):
@@ -97,7 +88,6 @@ def candidate_view(request, candidate_id):
         candidate_profile = get_object_or_404(CandidateProfile, id=candidate_id)
         user = candidate_profile.user  # Get the associated user
 
-        print("Candidate data")
         candidate_data = {
             'full_name': candidate_profile.full_name,
             'email': user.email,  # Ensure email is included
@@ -116,8 +106,7 @@ def candidate_view(request, candidate_id):
             'case_worker': candidate_profile.case_worker.user.username if candidate_profile.case_worker else None,
         }
 
-        #qualification data
-
+        # Qualification data
         qualifications = Qualification.objects.filter(candidate=candidate_profile)
         candidate_data['qualifications'] = [
             {
@@ -128,6 +117,7 @@ def candidate_view(request, candidate_id):
             } for qualification in qualifications
         ]
 
+        # Work experiences
         work_experiences = WorkExperience.objects.filter(candidate=candidate_profile)
         candidate_data['work_experiences'] = [
             {
@@ -139,21 +129,16 @@ def candidate_view(request, candidate_id):
             } for work_experience in work_experiences
         ]
 
-
-
-        
         # Get events related to the candidate's user
-        events = Event.objects.filter(owner=user)  # Filter events by the candidate's user
+        events = Event.objects.filter(owner=user)
         candidate_data['events'] = [
             {
                 'description': event.description,
                 'created_at': event.created_at,
             } for event in events
         ]
-        print("Event data")
 
-
-        #get applications from candidate profile
+        # Get applications from candidate profile
         applications = Application.objects.filter(applicant=user)
         candidate_data['applications'] = [
             {
@@ -167,17 +152,16 @@ def candidate_view(request, candidate_id):
                 'created_at': application.created_at.isoformat(),
             } for application in applications
         ]
-        print("Application data")
 
-        #get interviews from each application
+        # Get interviews from each application
         interviews = Interview.objects.filter(application__applicant=user)
         candidate_data['interviews'] = [
             {
                 'id': interview.id,
                 'application_id': interview.application.id,
-                'date': interview.date.isoformat(),
-                'start_time': interview.start_time.isoformat(),
-                'end_time': interview.end_time.isoformat(),
+                'date': interview.date.isoformat() if interview.date else None,
+                'start_time': interview.start_time.isoformat() if interview.start_time else None,
+                'end_time': interview.end_time.isoformat() if interview.end_time else None,
                 'interview_location': interview.interview_location,
                 'meeting_link': interview.meeting_link,
                 'additional_details': interview.additional_details,
@@ -189,31 +173,24 @@ def candidate_view(request, candidate_id):
                 'logo_url': request.build_absolute_uri(interview.application.job.employer.logo.url) if interview.application.job.employer.logo else None,
             } for interview in interviews
         ]
-        print("Interview data")
 
-
-        #job offers
+        # Job offers
         job_offers = JobOffer.objects.filter(candidate=candidate_profile)
         candidate_data['job_offers'] = [
             {
                 'job_title': job_offer.job_posting.job_title,
                 'employer': job_offer.employer.company_name,
-                'offer_date': job_offer.offer_datetime,
+                'offer_date': job_offer.offer_datetime.isoformat() if job_offer.offer_datetime else None,
                 'status': job_offer.status,
                 'additional_details': job_offer.additional_details,
                 'job_offer_document': request.build_absolute_uri(job_offer.job_offer_document.url) if job_offer.job_offer_document else None
             }
             for job_offer in job_offers
         ]
-        print("Job offer data")
 
-
-
-
-        # Return the candidate data
         return Response(candidate_data, status=200)
 
-    except CandidateProfile.DoesNotExist:
+    except Http404:
         return Response({'error': 'Candidate profile does not exist'}, status=404)
     except Exception as e:
         print(f"Error accessing candidate_view: {e}")
@@ -360,17 +337,18 @@ def job_posting_view(request, job_id):
 def job_application_view(request, application_id):
     try:
         application = get_object_or_404(Application, id=application_id)
-        candidate = application.applicant.candidateprofile
+        candidate = application.applicant
+        candidate_profile = candidate.candidateprofile
         
-        # Candidate Profile
-        candidate_profile = {
-            'full_name': candidate.full_name,
-            'email': application.applicant.email,
-            'phone_number': candidate.contact_phone,
-            'profile_picture': request.build_absolute_uri(candidate.profile_picture.url) if candidate.profile_picture else None,
-            'linkedin_profile': candidate.linkedin_profile,
-            'github_profile': candidate.github_profile,
-            'skills': list(candidate.skills.values_list('skill_name', flat=True)),
+        # Candidate profile
+        candidate_profile_data = {
+            'full_name': candidate_profile.full_name,
+            'email': candidate.email,
+            'contact_phone': candidate_profile.contact_phone,
+            'profile_picture': request.build_absolute_uri(candidate_profile.profile_picture.url) if candidate_profile.profile_picture else None,
+            'linkedin_profile': candidate_profile.linkedin_profile,
+            'github_profile': candidate_profile.github_profile,
+            'skills': list(candidate_profile.skills.values_list('skill_name', flat=True)),
         }
         
         # Application
@@ -386,18 +364,20 @@ def job_application_view(request, application_id):
         
         # Interviews
         interviews = Interview.objects.filter(application=application)
-        interview_data = [{
-            'id': interview.id,
-            'interview_type': interview.interview_type,
-            'date': interview.date.isoformat(),
-            'start_time': interview.start_time.isoformat(),
-            'end_time': interview.end_time.isoformat(),
-            'interview_location': interview.interview_location,
-            'meeting_link': interview.meeting_link,
-            'additional_details': interview.additional_details,
-            'status': interview.status,
-            'feedback': interview.feedback,
-        } for interview in interviews]
+        interview_data = [
+            {
+                'id': interview.id,
+                'interview_type': interview.interview_type,
+                'date': interview.date.isoformat() if interview.date else None,
+                'start_time': interview.start_time.isoformat() if interview.start_time else None,
+                'end_time': interview.end_time.isoformat() if interview.end_time else None,
+                'interview_location': interview.interview_location,
+                'meeting_link': interview.meeting_link,
+                'additional_details': interview.additional_details,
+                'status': interview.status,
+                'feedback': interview.feedback,
+            } for interview in interviews
+        ]
         
         # Job Offer
         job_offer = JobOffer.objects.filter(application=application).first()
@@ -406,23 +386,20 @@ def job_application_view(request, application_id):
             job_offer_data = {
                 'job_offer_document': request.build_absolute_uri(job_offer.job_offer_document.url) if job_offer.job_offer_document else None,
                 'additional_details': job_offer.additional_details,
-                'offer_datetime': job_offer.offer_datetime.isoformat(),
+                'offer_datetime': job_offer.offer_datetime.isoformat() if job_offer.offer_datetime else None,
                 'status': job_offer.status,
             }
         
         response_data = {
-            'candidateProfile': candidate_profile,
+            'candidateProfile': candidate_profile_data,
             'application': application_data,
             'interviews': interview_data,
             'jobOffer': job_offer_data,
         }
 
-
-        
-        
         return Response(response_data, status=200)
 
-    except Application.DoesNotExist:
+    except Http404:
         return Response({'error': 'Application does not exist'}, status=404)
     except Exception as e:
         print(f"Error accessing job_application_view: {e}")

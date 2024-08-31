@@ -27,6 +27,7 @@ urlpatterns = [
     path('candidates/', include('rjb.candidates.urls')),  # Include the candidates URLs
     path('coordinators/', include('rjb.coordinators.urls')),  # Include the coordinators URLs
     path('notifications/', include('rjb.notifications.urls')),  # Include the notifications URLs
+    path('chats/', include('rjb.chat.urls')),  # Include the chats URLs
 ]
 
 if settings.DEBUG:

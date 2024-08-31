@@ -128,9 +128,6 @@ def get_candidate_profile(request):
             for event in events
         ]
 
-
-
-
         response_data = {
             'candidate_profile': candidate_data,
             'qualifications': qualifications,
@@ -208,6 +205,12 @@ def create_candidate(request):
 
         print("Received data:", json.dumps(data, indent=2))
 
+        required_fields = ['username', 'email', 'password', 'full_name', 'case_worker_username', 'case_worker_email']
+        
+        for field in required_fields:
+            if field not in data:
+                return JsonResponse({'error': f'{field} is required'}, status=400)
+
         # Retrieve username and email for both candidate and case worker
         username = data.get('username')
         email = data.get('email')
@@ -257,6 +260,7 @@ def create_candidate(request):
         print(f"Created candidate profile: {candidate_profile}")
 
         # Handle profile picture
+        profile_picture_url = None
         if profile_picture:
             file_path = os.path.join(settings.MEDIA_ROOT, 'profile_pictures', f'{user.id}_{candidate_profile.id}')
             if not os.path.exists(file_path):
@@ -266,6 +270,7 @@ def create_candidate(request):
             candidate_profile.profile_picture = os.path.join('profile_pictures', f'{user.id}_{candidate_profile.id}', filename)
             candidate_profile.save()
             print(f"Saved profile picture: {candidate_profile.profile_picture}")
+            profile_picture_url = request.build_absolute_uri(candidate_profile.profile_picture.url)
 
         # Handle skills
         if 'skills' in data:
@@ -311,7 +316,7 @@ def create_candidate(request):
         create_candidate_signal.send(
             sender=candidate_profile.__class__, 
             candidate_profile=candidate_profile, 
-            profile_picture_url=request.build_absolute_uri(candidate_profile.profile_picture.url)
+            profile_picture_url=profile_picture_url
         )
 
         print("Candidate registration successful")

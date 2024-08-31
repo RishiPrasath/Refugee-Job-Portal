@@ -5,6 +5,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import WorkIcon from '@mui/icons-material/Work';
 import CurrencyPoundIcon from '@mui/icons-material/CurrencyPound';
 import InfoIcon from '@mui/icons-material/Info';
+import ChatIcon from '@mui/icons-material/Chat';
 import { useGlobalState } from '../../../globalState/globalState';
 
 interface JobDetails {
@@ -39,7 +40,7 @@ const JobPosting: React.FC = () => {
   };
   const [jobDetails, setJobDetails] = useState<JobDetails>(defaultJobDetails);
   const { company, jobId } = useParams<{ company: string; jobId: string }>();
-  const { email, username } = useGlobalState();
+  const { email, username, userID } = useGlobalState();
   const [isSaved, setIsSaved] = useState(false);
   const [hasApplied, setHasApplied] = useState(false); // New state for application status
   const navigate = useNavigate();
@@ -60,7 +61,7 @@ const JobPosting: React.FC = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(data);
+        console.log("Job Details: ",data);
         setJobDetails(data.job_details);
       } catch (error) {
         console.error('Failed to fetch job details:', error);
@@ -83,9 +84,9 @@ const JobPosting: React.FC = () => {
       }
     };
 
-    const checkIfApplied = async () => { // New function to check if the candidate has applied
+    const checkIfApplied = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/candidates/getAppliedJobs?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`);
+        const response = await fetch(`http://localhost:8000/candidates/checkIfApplied?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}&job_id=${jobId}`);
         const appliedJobs = await response.json();
         console.log("Applied Jobs:", appliedJobs);
         if (response.ok) {
@@ -117,7 +118,7 @@ const JobPosting: React.FC = () => {
         },
         body: JSON.stringify({ email, username, job_id: jobId, company_name: company, job_title: jobDetails.job_title }),
       });
-  
+
       if (response.ok) {
         setHasApplied(false);
         console.log('Application withdrawn successfully');
@@ -169,9 +170,46 @@ const JobPosting: React.FC = () => {
     }
   };
 
+  const handleChatClick = async () => {
+    try {
+      // Get employer user ID
+      const response = await fetch(`http://localhost:8000/chats/get_user_id_via_company_name/${company}/`);
+      if (!response.ok) {
+        throw new Error('Failed to get employer user ID');
+      }
+      const { user_id: employerUserID } = await response.json();
+
+      // Get or create chat group
+      const chatResponse = await fetch(`http://localhost:8000/chats/get_or_create_chat/${userID}/${employerUserID}/`);
+      if (!chatResponse.ok) {
+        throw new Error('Failed to get or create chat group');
+      }
+      const { chat_group_id: chatGroupID } = await chatResponse.json();
+
+      // Navigate to chat page
+      navigate(`/chat/${chatGroupID}`);
+    } catch (error) {
+      console.error('Error initiating chat:', error);
+    }
+  };
+
   const JobActions: React.FC = () => (
     <Grid item xs={12} display="flex" justifyContent="center" mt={2}>
-      <Button variant="contained" color="primary" sx={{ mr: 2, px: 4, py: 1.5 }} onClick={hasApplied ? handleWithdrawApplication : handleApplyForJob}>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mr: 2, px: 4, py: 1.5 }}
+        onClick={handleChatClick}
+        startIcon={<ChatIcon />}
+      >
+        Chat with Employer
+      </Button>
+      <Button
+        variant="contained"
+        color="primary"
+        sx={{ mr: 2, px: 4, py: 1.5 }}
+        onClick={hasApplied ? handleWithdrawApplication : handleApplyForJob}
+      >
         {hasApplied ? 'Withdraw Application' : 'Apply for Job'}
       </Button>
       <Button
@@ -198,7 +236,7 @@ const JobPosting: React.FC = () => {
                 Requirements:
               </Typography>
               <ul>
-                {jobDetails.requirements.split(',').map((requirement, index) => (
+                {jobDetails.requirements.split('|').map((requirement, index) => (
                   <li key={index}>
                     <Typography variant="body1">{requirement.trim()}</Typography>
                   </li>

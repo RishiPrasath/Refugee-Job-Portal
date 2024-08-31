@@ -1,24 +1,18 @@
+
 from django.dispatch import receiver
 from .signals import (
     create_interview, cancel_interview, create_job_posting, apply_for_job,
     create_job_offer, approve_job_offer, reject_job_offer, reject_candidate,
     approve_candidate, candidate_profile_update, employer_profile_update,
-    create_candidate, create_employer
+    create_candidate, create_employer, message_sent
 )
 
 from rjb.models import *
 from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
+from asgiref.sync import async_to_sync, sync_to_async
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils import timezone
-
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-from django.utils import timezone
-from django.dispatch import receiver
-from .signals import create_candidate
-
 
 # Fetch all Hiring Coordinators
 def get_all_hiring_coordinators():
@@ -1115,4 +1109,118 @@ def handle_create_employer(sender, **kwargs):
     # Notification Image: Company Logo
     # Message for each recipient:
     #   - Hiring Coordinator: "A new employer account has been created for {company_name}."
-    pass
+
+    employer_profile = kwargs.get('employer_profile')
+    logo_path = kwargs.get('logo_path')
+
+    # Fetch all Hiring Coordinators
+    hiring_coordinators = get_all_hiring_coordinators()
+
+    # Create Notification objects for all Hiring Coordinators
+    for hc in hiring_coordinators:
+        notification = Notification.objects.create(
+            message=f"A new employer account has been created for {employer_profile.company_name}.",
+            recipient=hc,
+            owner=employer_profile.user,
+            routetopage=f"/employer-view/{employer_profile.id}"
+        )
+
+    # Create Event object
+    event = Event.objects.create(
+        owner=employer_profile.user,
+        description=f"A new employer account has been created for {employer_profile.company_name}."
+    )
+
+    # Form JSON for WebSocket data
+    channel_layer = get_channel_layer()
+    for hc in hiring_coordinators:
+        notification_json = {
+            'description': notification.message,
+            'recipient': hc.id,
+            'owner': employer_profile.user.id,
+            'routetopage': f"/employer-view/{employer_profile.id}",
+            'created_at': timezone.now().isoformat(),
+            'notification_image': logo_path  # Use employer logo path
+        }
+        async_to_sync(channel_layer.group_send)(
+            f'notifications_{hc.id}',
+            {
+                'type': 'notification_message',
+                'message': notification_json
+            }
+        )
+
+
+async def get_sender_name(sender_user):
+    if sender_user.role == 'Hiring Coordinator':
+        profile = await sync_to_async(HiringCoordinatorProfile.objects.get)(user=sender_user)
+        return profile.full_name
+    elif sender_user.role == 'Case Worker':
+        profile = await sync_to_async(CaseWorkerProfile.objects.get)(user=sender_user)
+        return profile.full_name
+    elif sender_user.role == 'Candidate':
+        profile = await sync_to_async(CandidateProfile.objects.get)(user=sender_user)
+        return profile.full_name
+    else:
+        # employer company name
+        profile = await sync_to_async(EmployerProfile.objects.get)(user=sender_user)
+        return profile.company_name
+
+
+async def get_notification_image(sender_user, request):
+    if sender_user.role == 'Hiring Coordinator':
+        return None
+    elif sender_user.role == 'Case Worker':
+        return None
+    elif sender_user.role == 'Candidate':
+        sender_profile = await sync_to_async(CandidateProfile.objects.get)(user=sender_user)    
+        return request.build_absolute_uri(sender_profile.profile_picture.url) if sender_profile.profile_picture else None
+    else:
+        sender_profile = await sync_to_async(EmployerProfile.objects.get)(user=sender_user)
+        return request.build_absolute_uri(sender_profile.logo.url) if sender_profile.logo else None
+
+
+
+@receiver(message_sent)
+async def handle_message_sent(sender, **kwargs):
+    message = kwargs.get('message')
+    sender_user = kwargs.get('sender_user')
+    recipient = kwargs.get('recipient')
+
+    
+
+    sender_name = await get_sender_name(sender_user) 
+
+    
+    
+
+    # Create Notification object for the recipient
+    notification = await sync_to_async(Notification.objects.create)(
+        message=f"New message from {sender_name}: {message.content}",
+        recipient=recipient,
+        owner=sender_user,
+        routetopage=f"/chat/{message.chat_group.id}"
+    )
+
+
+    print("Notification image: ", await get_notification_image(sender_user))
+
+    # Form JSON for WebSocket data
+    notification_json = {
+        'description': notification.message,
+        'recipient': notification.recipient.id,
+        'owner': notification.owner.id,
+        'routetopage': notification.routetopage,
+        'created_at': notification.created_at.isoformat(),
+        'notification_image': await get_notification_image(sender_user)
+    }
+
+    # Send notification via WebSocket
+    channel_layer = get_channel_layer()
+    await channel_layer.group_send(
+        f'notifications_{recipient.id}',
+        {
+            'type': 'notification_message',
+            'message': notification_json
+        }
+    )

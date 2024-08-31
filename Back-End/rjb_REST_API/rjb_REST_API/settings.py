@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'daphne',  # Move daphne to the top
+    'daphne',  
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'channels_redis',
-    'rjb.apps.RjbConfig',  # Added this line
+    'rjb.apps.RjbConfig', 
+    'django_extensions',
 ]
 
 MIDDLEWARE = [

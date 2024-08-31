@@ -19,7 +19,7 @@ from rjb.notifications.signals import apply_for_job
 from rjb.notifications.signals import approve_job_offer
 from rjb.notifications.signals import reject_job_offer
 from rjb.notifications.signals import candidate_profile_update
-
+from django.core.exceptions import ObjectDoesNotExist
 
 @api_view(['GET'])
 def home(request):
@@ -451,7 +451,7 @@ def getCandidateJobOffers(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     
-@api_view(['POST'])
+@require_POST
 def approveJobOffer(request, job_offer_id):
     try:
         job_offer = JobOffer.objects.get(id=job_offer_id)
@@ -459,7 +459,9 @@ def approveJobOffer(request, job_offer_id):
         job_offer.save()
 
         # Get the absolute path of the candidate's profile picture
-        candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url)
+        candidate_profile_picture_path = None
+        if hasattr(job_offer.candidate, 'profile_picture') and job_offer.candidate.profile_picture:
+            candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url)
 
         # Trigger the signal
         approve_job_offer.send(
@@ -471,6 +473,8 @@ def approveJobOffer(request, job_offer_id):
         return JsonResponse({'message': 'Job offer approved successfully'}, status=200)
     except JobOffer.DoesNotExist:
         return JsonResponse({'error': 'Job offer not found'}, status=404)
+    except ObjectDoesNotExist as e:
+        return JsonResponse({'error': str(e)}, status=404)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
@@ -482,7 +486,7 @@ def rejectJobOffer(request, job_offer_id):
         job_offer.save()
 
         # Get the absolute path of the candidate's profile picture
-        candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url)
+        candidate_profile_picture_path = request.build_absolute_uri(job_offer.candidate.profile_picture.url) if job_offer.candidate.profile_picture else None
 
         # Trigger the signal
         reject_job_offer.send(
@@ -919,6 +923,11 @@ def deleteQualification(request):
 def getQualifications(request):
     email = request.GET.get('email')
     username = request.GET.get('username')
+
+    # Check for unexpected parameters
+    expected_params = {'email', 'username'}
+    if not expected_params.issuperset(request.GET.keys()):
+        return JsonResponse({'error': 'Invalid parameters'}, status=400)
 
     try:
         user = User.objects.get(username=username, email=email)

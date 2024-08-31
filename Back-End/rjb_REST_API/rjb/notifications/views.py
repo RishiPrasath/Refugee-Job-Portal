@@ -1,6 +1,8 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rjb.models import Notification, User
+from django.shortcuts import get_object_or_404
+from django.http import Http404
 
 @api_view(['GET'])
 def get_notifications(request):
@@ -15,7 +17,7 @@ def get_notifications(request):
     except User.DoesNotExist:
         return Response({"error": "User not found."}, status=404)
 
-    notifications = Notification.objects.filter(recipient=user)
+    notifications = Notification.objects.filter(recipient=user, dismissed=False)
     notification_data = []
 
     for notification in notifications:
@@ -36,3 +38,13 @@ def get_notifications(request):
         })
 
     return Response(notification_data)
+
+@api_view(['POST'])
+def dismiss_notification(request, notification_id):
+    try:
+        notification = get_object_or_404(Notification, id=notification_id)
+        notification.dismissed = True
+        notification.save()
+        return Response({"message": "Notification dismissed successfully"})
+    except Http404:
+        return Response({"error": "Not found."}, status=404)

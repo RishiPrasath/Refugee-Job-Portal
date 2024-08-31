@@ -14,6 +14,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useGlobalState } from '../../globalState/globalState';
 import NotificationList from '../Notifications/NotificationList';
 import SearchIcon from '@mui/icons-material/Search';
+import ChatIcon from '@mui/icons-material/Chat';
 
 type Notification = {
   id: number;
@@ -54,7 +55,6 @@ const NavBar: React.FC = () => {
       ws.current = new WebSocket(`ws://localhost:8000/ws/notifications/${userID}/`);
 
       ws.current.onopen = () => {
-        console.log('WebSocket connection established');
         console.log(`Connected to notification group: notifications_${userID}`);
       };
 
@@ -123,8 +123,6 @@ const NavBar: React.FC = () => {
           }
 
           console.log('Received Event WebSocket message:', message);
-
-          
         };
 
         eventWs.current.onerror = (error) => {
@@ -156,7 +154,7 @@ const NavBar: React.FC = () => {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log("Notifications: ",data);
+        console.log("Notifications: ", data);
         setNotifications(data);
       } catch (error) {
         console.error('Error fetching notifications:', error);
@@ -189,6 +187,22 @@ const NavBar: React.FC = () => {
     setAnchorEl(null);
   };
 
+  const handleDismissNotification = async (id: number) => {
+    try {
+      const response = await fetch(`http://localhost:8000/notifications/dismiss/${id}/`, {
+        method: 'POST',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to dismiss notification');
+      }
+      setNotifications((prevNotifications) =>
+        prevNotifications.filter((notification) => notification.id !== id)
+      );
+    } catch (error) {
+      console.error('Error dismissing notification:', error);
+    }
+  };
+
   const renderNavItems = (
     <List style={{ display: isMobile ? 'block' : 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
       {loggedIn && (
@@ -196,6 +210,10 @@ const NavBar: React.FC = () => {
           <ListItem button component={Link} to="/home" style={{ fontSize: isMobile ? '1.5rem' : '0.64rem', padding: isMobile ? '0 2rem' : '0 1rem', marginBottom: isMobile ? '1rem' : '0' }}>
             <HomeIcon style={{ marginRight: isMobile ? '0.6rem' : '0.3rem', fontSize: isMobile ? '1.8rem' : '0.8rem' }} />
             <ListItemText primary="Home" />
+          </ListItem>
+          <ListItem button component={Link} to="/chat-menu" style={{ fontSize: isMobile ? '1.5rem' : '0.64rem', padding: isMobile ? '0 2rem' : '0 1rem', marginBottom: isMobile ? '1rem' : '0' }}>
+            <ChatIcon style={{ marginRight: isMobile ? '0.6rem' : '0.3rem', fontSize: isMobile ? '1.8rem' : '0.8rem' }} />
+            <ListItemText primary="Chats" />
           </ListItem>
           {userType === 'Employer' && (
             <>
@@ -317,7 +335,7 @@ const NavBar: React.FC = () => {
               horizontal: 'right',
             }}
           >
-            <NotificationList notifications={notifications} onClose={handleNotificationClose} />
+            <NotificationList notifications={notifications} onClose={handleNotificationClose} onDismiss={handleDismissNotification} />
           </Popover>
         </Toolbar>
       </AppBar>

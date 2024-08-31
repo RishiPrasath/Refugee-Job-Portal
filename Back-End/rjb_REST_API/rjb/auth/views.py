@@ -13,6 +13,8 @@ from django.contrib.auth import authenticate
 from rjb.models import *
 import base64
 from rjb.notifications.signals import create_candidate
+from rjb.notifications.signals import create_employer
+
 
 
 @csrf_exempt
@@ -50,7 +52,7 @@ def login(request):
             full_name = candidate_profile.full_name
             immigration_status = candidate_profile.immigration_status
             accessibility_requirements = candidate_profile.accessibility_requirements
-            assigned_case_worker = candidate_profile.case_worker.full_name
+            assigned_case_worker = candidate_profile.case_worker.full_name if candidate_profile.case_worker else " "
             skills = [skill.skill_name for skill in candidate_profile.skills.all()]
             print("Skills: ", skills)
             if candidate_profile.profile_picture:
@@ -92,8 +94,7 @@ def login(request):
     except Exception as e:
         print("Exception occurred:", str(e))
         print(traceback.format_exc())  # Print the full traceback for debugging
-        return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
-    
+        return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)    
 
     
 @api_view(['POST'])
@@ -106,6 +107,7 @@ def register(request):
 
 def register_candidate(request):
     if request.method == 'POST':
+        print("register_candidate view called")  # Debugging statement
         try:
             data = request.POST.dict()
             profile_picture = request.FILES.get('profile_picture')
@@ -121,6 +123,11 @@ def register_candidate(request):
                 'accessibility_requirements', 'immigration_status', 
                 'skills', 'qualifications', 'workExperiences'
             ]
+            
+            # Check for missing mandatory fields
+            missing_fields = [field for field in mandatory_fields if field not in data]
+            if missing_fields:
+                return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
             
             # Check if user already exists
             if User.objects.filter(username=data['username']).exists():
@@ -221,6 +228,7 @@ def register_candidate(request):
             print("Exception occurred:", str(e))
             print(traceback.format_exc())  # Print the full traceback for debugging
             return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
+
 @csrf_exempt
 def register_employer(request):
     if request.method == 'POST':
@@ -235,40 +243,26 @@ def register_employer(request):
             else:
                 print("No logo file received")
 
+            # Define mandatory and optional fields
+            mandatory_fields = [
+                'username', 'password', 'email', 'role', 'company_name', 
+                'contact_phone', 'location', 'industry'
+            ]
+            optional_fields = [
+                'website_url', 'description'
+            ]
+            
+            # Check for missing mandatory fields
+            missing_fields = [field for field in mandatory_fields if field not in data]
+            if missing_fields:
+                return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
+            
             # Check if user already exists
             if User.objects.filter(username=data['username']).exists():
                 return JsonResponse({'error': 'A user with this username already exists'}, status=400)
             if User.objects.filter(email=data['email']).exists():
                 return JsonResponse({'error': 'A user with this email already exists'}, status=400)
 
-            # Define mandatory and optional fields
-            mandatory_fields = [
-                'username', 'password', 'email', 'role', 'company_name', 
-                'contact_phone', 'location', 'logo', 'industry'
-            ]
-            optional_fields = [
-                'website_url', 'description'
-            ]
-            
-            # Check and print mandatory fields
-            print("Mandatory Fields:")
-            for field in mandatory_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: MISSING")
-            
-            # Check and print optional fields
-            print("\nOptional Fields:")
-            for field in optional_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: Not provided")
-            
-            if logo:
-                print(f"logo: {logo.name}")
-            
             # Create User and EmployerProfile
             user = User.objects.create_user(
                 username=data['username'],
@@ -306,6 +300,9 @@ def register_employer(request):
                 final_logo_path = os.path.join(settings.MEDIA_ROOT, str(employer_profile.logo))  # Convert to string
                 print("Final logo path: ", final_logo_path)
 
+            # Trigger the create_employer signal
+            create_employer.send(sender=register_employer, employer_profile=employer_profile, logo_path=employer_profile.logo.url)
+
             return JsonResponse({'message': 'Employer registration successful', 'data': data})
         except Exception as e:
             print("Exception occurred:", str(e))
@@ -317,40 +314,42 @@ def register_hiring_coordinator(request):
     if request.method == 'POST':
         try:
             data = request.POST.dict()
-            
+
             # Define mandatory fields
-            mandatory_fields = ['username', 'password', 'email', 'role', 'full_name']
-            
-            # Check and print mandatory fields
-            print("Mandatory Fields:")
-            for field in mandatory_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: MISSING")
-            
+            mandatory_fields = [
+                'username', 'password', 'email', 'role', 'full_name'
+            ]
+
+            # Check for missing mandatory fields
+            missing_fields = [field for field in mandatory_fields if field not in data]
+            if missing_fields:
+                return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
+
             # Check if user already exists
             if User.objects.filter(username=data['username']).exists():
                 return JsonResponse({'error': 'A user with this username already exists'}, status=400)
             if User.objects.filter(email=data['email']).exists():
                 return JsonResponse({'error': 'A user with this email already exists'}, status=400)
-            
-            # Create User
+
+            # Create User and HiringCoordinatorProfile
             user = User.objects.create_user(
                 username=data['username'],
                 password=data['password'],
                 email=data['email'],
-                role=data['role']
+                role='Hiring Coordinator'
             )
-            
-            # Create HiringCoordinatorProfile
-            HiringCoordinatorProfile.objects.create(
+            user.save()
+
+            hiring_coordinator_profile = HiringCoordinatorProfile(
                 user=user,
                 full_name=data['full_name']
             )
-            
+            hiring_coordinator_profile.save()
+
             return JsonResponse({'message': 'Hiring Coordinator registration successful', 'data': data})
         except Exception as e:
+            print("Exception occurred:", str(e))
+            print(traceback.format_exc())  # Print the full traceback for debugging
             return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)
 
 @csrf_exempt
@@ -362,13 +361,10 @@ def register_case_worker(request):
             # Define mandatory fields
             mandatory_fields = ['username', 'password', 'email', 'role', 'full_name']
             
-            # Check and print mandatory fields
-            print("Mandatory Fields:")
-            for field in mandatory_fields:
-                if field in data:
-                    print(f"{field}: {data[field]}")
-                else:
-                    print(f"{field}: MISSING")
+            # Check for missing mandatory fields
+            missing_fields = [field for field in mandatory_fields if field not in data]
+            if missing_fields:
+                return JsonResponse({'error': f'Missing required fields: {", ".join(missing_fields)}'}, status=400)
             
             # Check if user already exists
             if User.objects.filter(username=data['username']).exists():
@@ -392,4 +388,6 @@ def register_case_worker(request):
             
             return JsonResponse({'message': 'Case Worker registration successful', 'data': data})
         except Exception as e:
+            print("Exception occurred:", str(e))
+            print(traceback.format_exc())  # Print the full traceback for debugging
             return JsonResponse({'error': 'An error occurred', 'details': str(e)}, status=500)

@@ -8,12 +8,19 @@ import Profile from './EmployerView/Profile';
 import JobPostings from './EmployerView/JobPostings';
 import Interviews from './EmployerView/Interviews';
 import Events from './EmployerView/Events';
+import { useGlobalState } from '../../../globalState/globalState';
+
 
 const EmployerView: React.FC = () => {
   const { employerId } = useParams<{ employerId: string }>();
   const [employerData, setEmployerData] = useState<any>(null);
-
+  const {userID} = useGlobalState();
   useEffect(() => {
+
+    console.log("Current user ID:", userID);
+
+
+
     const fetchEmployerData = async () => {
       try {
         const response = await fetch(`http://localhost:8000/coordinators/employer_view/${employerId}/`);

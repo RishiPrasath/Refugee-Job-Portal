@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from rjb.notifications.signals import *
 from django.http import HttpRequest
 from rjb.notifications.signals import create_interview  # Ensure this import is present
+from django.http import Http404
 
 # Home view for the employer portal
 @api_view(['GET'])
@@ -88,6 +89,8 @@ def getJobPostings(request):
         return Response({"job_postings": list(job_postings)})
     except EmployerProfile.DoesNotExist:
         return Response({"error": "Employer not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 # View to get details of a specific job posting
 @api_view(['GET'])
@@ -536,8 +539,6 @@ def updateJobOffer(request):
         additional_details = request.data.get('additionalDetails')
         job_offer_document = request.FILES.get('jobOfferDocument')
 
-       
-
         # Debugging
         print("Job offer ID:", job_offer_id)
         print("Additional details:", additional_details)
@@ -573,8 +574,10 @@ def updateJobOffer(request):
         }
 
         return Response(job_offer_data, status=200)
+    except Http404:
+        return Response({"message": "Job offer not found"}, status=404)  # Handle 404 specifically
     except Exception as e:
-        print("Error in updateJobOffer:", str(e))
+        print("Error in updateJobOffer:", str(e))  # Consider using logging instead
         return Response({"message": "An error occurred", "error": str(e)}, status=500)
 
 # View to reject a candidate application
@@ -648,22 +651,27 @@ def getProfile(request):
 @csrf_exempt
 def updateProfile(request):
     try:
-        username = request.data.get('username')
-        email = request.data.get('email')
-        
+        data = request.data
+        username = data.get('username')
+        email = data.get('email')
+
         if not username or not email:
             return Response({"error": "Username and email are required"}, status=400)
 
         user = get_object_or_404(User, username=username, email=email)
-        employer_profile = get_object_or_404(EmployerProfile, user=user)
+        
+        try:
+            employer_profile = EmployerProfile.objects.get(user=user)
+        except EmployerProfile.DoesNotExist:
+            return Response({"error": "Employer profile not found"}, status=404)
 
         # Update fields
-        employer_profile.company_name = request.data.get('company_name', employer_profile.company_name)
-        employer_profile.industry = request.data.get('industry', employer_profile.industry)
-        employer_profile.contact_phone = request.data.get('contact_phone', employer_profile.contact_phone)
-        employer_profile.location = request.data.get('location', employer_profile.location)
-        employer_profile.website_url = request.data.get('website_url', employer_profile.website_url)
-        employer_profile.description = request.data.get('description', employer_profile.description)
+        employer_profile.company_name = data.get('company_name', employer_profile.company_name)
+        employer_profile.industry = data.get('industry', employer_profile.industry)
+        employer_profile.contact_phone = data.get('contact_phone', employer_profile.contact_phone)
+        employer_profile.location = data.get('location', employer_profile.location)
+        employer_profile.website_url = data.get('website_url', employer_profile.website_url)
+        employer_profile.description = data.get('description', employer_profile.description)
 
         employer_profile.save()
 
@@ -678,5 +686,7 @@ def updateProfile(request):
         )
 
         return Response({"message": "Profile updated successfully"}, status=200)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)

@@ -28,6 +28,8 @@ import EmployerView from './components/roles/HiringCoordinator/EmployerView';
 import CreateCandidate from './components/roles/CaseWorker/createCandidate';
 import Search from './components/roles/HiringCoordinator/Search';
 import { GlobalStateProvider } from './globalState/globalState';
+import Chat from './components/chat/Chat';
+import ChatMenu from './components/chat/ChatMenu';
 import './App.css';
 
 const App = () => {
@@ -62,6 +64,8 @@ const App = () => {
                     <Route path="/employer-view/:employerId" element={<EmployerView />} />
                     <Route path="/create-candidate" element={<CreateCandidate />} />
                     <Route path="/hiring-coordinator-search" element={<Search />} />
+                    <Route path="/chat/:chatGroupId" element={<Chat />} />
+                    <Route path="/chat-menu" element={<ChatMenu />} />
                 </Routes>
             </Router>
         </GlobalStateProvider>

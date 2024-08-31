@@ -209,22 +209,6 @@ class Interview(models.Model):
     # Feedback from the interview
     feedback = models.TextField(null=True, blank=True)
 
-
-
-
-# Messages model to facilitate message exchanges between users, supporting direct communication within the platform.
-class Message(models.Model):
-    # Foreign key linking to the User model (sender)
-    sender = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
-    # Foreign key linking to the User model (receiver)
-    receiver = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
-    # Content of the message
-    content = models.TextField(null=True, blank=True)
-    # Category of the message
-    category = models.CharField(max_length=255, null=True, blank=True)
-    # Timestamp of when the message was sent
-    sent_at = models.DateTimeField(auto_now_add=True)
-
 # New CandidateSavesJobPosting model
 class CandidateSavesJobPosting(models.Model):
     candidate = models.ForeignKey('CandidateProfile', on_delete=models.CASCADE)
@@ -270,3 +254,29 @@ class Event(models.Model):
 
     def __str__(self):
         return f"Event for {self.owner.username} - {self.description[:20]}"
+    
+class ChatGroup(models.Model):
+    # ForeignKey to User model representing the first user in the chat group
+    user1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_groups_as_user1')
+    # ForeignKey to User model representing the second user in the chat group
+    user2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_groups_as_user2')
+
+    class Meta:
+        # Ensure that the combination of user1 and user2 is unique
+        unique_together = ('user1', 'user2')
+
+class Message(models.Model):
+    # ForeignKey to ChatGroup model representing the chat group this message belongs to
+    chat_group = models.ForeignKey(ChatGroup, on_delete=models.CASCADE, related_name='messages', null=True, blank=True)
+    # Text content of the message
+    content = models.TextField()
+    # ForeignKey to User model representing the sender of the message
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    # Timestamp when the message was created, automatically set to the current date and time
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Order messages by their timestamp in ascending order
+        ordering = ['timestamp']
+
+

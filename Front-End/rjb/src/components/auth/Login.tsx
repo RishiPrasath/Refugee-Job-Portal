@@ -75,7 +75,7 @@ const Login: React.FC = () => {
         setImmigrationStatus(data.immigration_status);
         setCompanyName(data.company_name);
         setAssignedCaseWorker(data.assigned_case_worker);
-        setUserID(data.id); // Set userID here
+        setUserID(data.id); 
 
         // Log global state variables
         console.log('Global State after login:', {
