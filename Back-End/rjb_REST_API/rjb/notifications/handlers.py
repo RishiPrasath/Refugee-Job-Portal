@@ -1167,19 +1167,31 @@ async def get_sender_name(sender_user):
         return profile.company_name
 
 
-async def get_notification_image(sender_user, request):
+async def get_notification_image(sender_user):
     if sender_user.role == 'Hiring Coordinator':
         return None
     elif sender_user.role == 'Case Worker':
         return None
     elif sender_user.role == 'Candidate':
         sender_profile = await sync_to_async(CandidateProfile.objects.get)(user=sender_user)    
-        return request.build_absolute_uri(sender_profile.profile_picture.url) if sender_profile.profile_picture else None
+        return sender_profile.profile_picture.url if sender_profile.profile_picture else None
     else:
         sender_profile = await sync_to_async(EmployerProfile.objects.get)(user=sender_user)
-        return request.build_absolute_uri(sender_profile.logo.url) if sender_profile.logo else None
+        return sender_profile.logo.url if sender_profile.logo else None
 
 
+
+async def get_notification_image(sender_user):
+    if sender_user.role == 'Hiring Coordinator':
+        return None
+    elif sender_user.role == 'Case Worker':
+        return None
+    elif sender_user.role == 'Candidate':
+        sender_profile = await sync_to_async(CandidateProfile.objects.get)(user=sender_user)    
+        return sender_profile.profile_picture.url if sender_profile.profile_picture else None
+    else:
+        sender_profile = await sync_to_async(EmployerProfile.objects.get)(user=sender_user)
+        return sender_profile.logo.url if sender_profile.logo else None
 
 @receiver(message_sent)
 async def handle_message_sent(sender, **kwargs):
@@ -1187,12 +1199,7 @@ async def handle_message_sent(sender, **kwargs):
     sender_user = kwargs.get('sender_user')
     recipient = kwargs.get('recipient')
 
-    
-
     sender_name = await get_sender_name(sender_user) 
-
-    
-    
 
     # Create Notification object for the recipient
     notification = await sync_to_async(Notification.objects.create)(
@@ -1202,8 +1209,8 @@ async def handle_message_sent(sender, **kwargs):
         routetopage=f"/chat/{message.chat_group.id}"
     )
 
-
-    print("Notification image: ", await get_notification_image(sender_user))
+    notification_image = await get_notification_image(sender_user)
+    print("Notification image: ", notification_image)
 
     # Form JSON for WebSocket data
     notification_json = {
@@ -1212,7 +1219,7 @@ async def handle_message_sent(sender, **kwargs):
         'owner': notification.owner.id,
         'routetopage': notification.routetopage,
         'created_at': notification.created_at.isoformat(),
-        'notification_image': await get_notification_image(sender_user)
+        'notification_image': notification_image
     }
 
     # Send notification via WebSocket
