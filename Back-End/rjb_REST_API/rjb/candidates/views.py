@@ -452,6 +452,7 @@ def getCandidateJobOffers(request):
         return JsonResponse({'error': str(e)}, status=500)
     
 @require_POST
+@csrf_exempt
 def approveJobOffer(request, job_offer_id):
     try:
         job_offer = JobOffer.objects.get(id=job_offer_id)

@@ -79,7 +79,7 @@ const ApplicationCard: React.FC<ApplicationCardProps> = ({ application, onReject
             </Box>
             <Box display="flex" alignItems="center">
               <EventIcon sx={{ mr: 1 }} />
-              <Typography variant="body2"><strong>Created At:</strong> {application.created_at}</Typography>
+              <Typography variant="body2"><strong>Applied At:</strong> {application.created_at}</Typography>
             </Box>
           </Box>
           <Box mt={2}>

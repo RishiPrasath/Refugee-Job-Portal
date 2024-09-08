@@ -22,10 +22,27 @@ interface JobOffer {
 }
 
 const JobOfferCard: React.FC<{ jobOffer: JobOffer, onStatusChange: () => void }> = ({ jobOffer, onStatusChange }) => {
+  const getCSRFToken = () => {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + '=')) {
+        return cookie.substring(name.length + 1);
+      }
+    }
+    return null;
+  };
+
   const handleApprove = async () => {
     try {
+      const csrfToken = getCSRFToken();
       const response = await fetch(`http://localhost:8000/candidates/approveJobOffer/${jobOffer.id}/`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken || '',
+        },
       });
       if (response.ok) {
         onStatusChange();
@@ -39,8 +56,13 @@ const JobOfferCard: React.FC<{ jobOffer: JobOffer, onStatusChange: () => void }>
 
   const handleReject = async () => {
     try {
+      const csrfToken = getCSRFToken();
       const response = await fetch(`http://localhost:8000/candidates/rejectJobOffer/${jobOffer.id}/`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken || '',
+        },
       });
       if (response.ok) {
         onStatusChange();
